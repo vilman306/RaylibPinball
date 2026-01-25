@@ -1,0 +1,24 @@
+# Build artifacts
+/build/
+/CMakeFiles/
+/CMakeCache.txt
+/cmake_install.cmake
+/Makefile
+/*.exe
+/*.out
+/*.o
+
+# VSCode
+.vscode/
+
+# Compiled libraries
+*.a
+*.so
+*.dylib
+
+# Raylib build
+thirdParty/raylib/build/
+
+# Misc
+*.log
+*.tmp

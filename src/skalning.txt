@@ -1,0 +1,49 @@
+#include "raylib.h"
+#include <string>
+#include "math.h"
+#include "Constants.h"
+#include "Game.h"
+
+int main(){
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    InitWindow(800, 400, "Game");
+    SetTargetFPS(100);
+    
+    
+
+    const int virtualWidth = 800;
+    const int virtualHeight = 400;
+
+    RenderTexture2D target = LoadRenderTexture(virtualWidth, virtualHeight); // Texture to draw on (which then is scaled to actual window size)
+    Game game;
+
+    while(!WindowShouldClose()){
+        
+        
+        // 1. handle input
+        // 2. update game
+        
+        // 3. draw
+
+        // 3.1. draw to render texture
+        BeginTextureMode(target);
+        game.Draw(target);
+        EndTextureMode();
+
+        // 3.2. output scaled texture to window
+        BeginDrawing();
+        ClearBackground(BLACK);
+        float scaleX = (float)GetScreenWidth() / virtualWidth;
+        float scaleY = (float)GetScreenHeight() / virtualHeight;
+        float scale = std::fmin(scaleX, scaleY); // keep aspect ratio
+        float scaledWidth = virtualWidth * scale;
+        float scaledHeight = virtualHeight * scale;
+        float offsetX = (GetScreenWidth() - scaledWidth) * 0.5f;
+        float offsetY = (GetScreenHeight() - scaledHeight) * 0.5f;
+        DrawTexturePro(target.texture, {0, 0, (float)target.texture.width, -(float)target.texture.height}, {offsetX, offsetY, scaledWidth, scaledHeight}, {0, 0}, 0.0f, WHITE);
+        EndDrawing();
+        }
+    CloseWindow();
+    return 0;
+}
+
