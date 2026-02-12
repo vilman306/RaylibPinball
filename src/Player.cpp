@@ -1,18 +1,18 @@
 #include "raylib.h"
 #include "Player.h"
+#include "Config.h"
+#include "Vec2Extensions.h"
 
-Player::Player(int gameWidth, int gameHeight)
+Player::Player()
 {
-    gameWidth = gameWidth;
-    gameHeight = gameHeight;
-    velocity = {0.0f, 0.0f};
+    velocity = {0.0f, 20.0f};
     color = RED;
-    position = {0.5f*gameWidth, 0.5f*gameHeight};
+    position = {0.5f*Config::virtualWidth, 0.5f*Config::virtualHeight};
 }
 
-void Player::Update()
+void Player::Update(float dt)
 {
-    
+    position += velocity * dt;
 }
 
 void Player::Draw()

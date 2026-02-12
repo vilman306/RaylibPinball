@@ -2,13 +2,15 @@
 #include <string>
 #include "math.h"
 #include "Game.h"
+#include "Config.h"
 
-Game::Game() : player(virtualWidth, virtualHeight)
+Game::Game()
 {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(1200, 800, "Spelfönster");
     SetTargetFPS(100);
-    renderTexture = LoadRenderTexture(virtualWidth, virtualHeight);
+    renderTexture = LoadRenderTexture(Config::virtualWidth,
+                                        Config::virtualHeight);
     
 }
 
@@ -28,7 +30,8 @@ void Game::Run()
 
 void Game::Update()
 {
-    player.Update();
+    float dt = GetFrameTime();
+    player.Update(dt);
 }
 
 void Game::Draw()
@@ -55,11 +58,11 @@ void Game::DrawScaledRenderTexture()
 {
     BeginDrawing();
     ClearBackground(BLACK);
-    float scaleX = (float)GetScreenWidth() / virtualWidth;
-    float scaleY = (float)GetScreenHeight() / virtualHeight;
+    float scaleX = (float)GetScreenWidth() / Config::virtualWidth;
+    float scaleY = (float)GetScreenHeight() / Config::virtualHeight;
     float scale = std::fmin(scaleX, scaleY); // keep aspect ratio
-    float scaledWidth = virtualWidth * scale;
-    float scaledHeight = virtualHeight * scale;
+    float scaledWidth = Config::virtualWidth * scale;
+    float scaledHeight = Config::virtualHeight * scale;
     float offsetX = (GetScreenWidth() - scaledWidth) * 0.5f;
     float offsetY = (GetScreenHeight() - scaledHeight) * 0.5f;
     DrawTexturePro(renderTexture.texture, {0, 0, (float)renderTexture.texture.width, -(float)renderTexture.texture.height}, {offsetX, offsetY, scaledWidth, scaledHeight}, {0, 0}, 0.0f, WHITE);

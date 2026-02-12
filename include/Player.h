@@ -3,12 +3,10 @@
 class Player
 {
 public:
-    Player(int gameWidth, int gameHeight);
-    void Update();
+    Player();
+    void Update(float dt);
     void Draw();
 private:
-    int gameWidth;
-    int gameHeight;
     Vector2 position;
     Vector2 velocity;
     Color color;

@@ -13,8 +13,6 @@ public:
     void DrawScaledRenderTexture();
 
 private:
-    const int virtualWidth = 200;
-    const int virtualHeight = 100;
     RenderTexture2D renderTexture; // Texture to draw on (which then is scaled to actual window size)
     Player player;
     Level level;
