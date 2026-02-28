@@ -1,6 +1,6 @@
 #pragma once
 #include "raylib.h"
-#include "Player.h"
+#include "Ball.h"
 #include "Level.h"
 class Game
 {
@@ -14,7 +14,7 @@ public:
 
 private:
     RenderTexture2D renderTexture; // Texture to draw on (which then is scaled to actual window size)
-    Player player;
+    Ball ball;
     Level level;
     float time;
 };

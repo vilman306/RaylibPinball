@@ -31,7 +31,7 @@ void Game::Run()
 void Game::Update()
 {
     float dt = GetFrameTime();
-    player.Update(dt);
+    ball.Update(dt);
 }
 
 void Game::Draw()
@@ -47,7 +47,7 @@ void Game::Draw()
     time = GetTime();
     DrawText(std::to_string(time).c_str(), 700, 10, 15, PURPLE);
 
-    player.Draw();
+    ball.Draw();
     // -----------
     EndTextureMode();
 

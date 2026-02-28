@@ -1,9 +1,9 @@
 #pragma once
 #include "raylib.h"
-class Player
+class Ball
 {
 public:
-    Player();
+    Ball();
     void Update(float dt);
     void Draw();
 private:
