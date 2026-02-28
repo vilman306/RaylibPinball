@@ -2,6 +2,10 @@
 #include "raylib.h"
 #include "Ball.h"
 #include "Level.h"
+#include "PhysicsManager.h"
+#include "AudioManager.h"
+
+
 class Game
 {
 public:
@@ -14,6 +18,8 @@ public:
 
 private:
     RenderTexture2D renderTexture; // Texture to draw on (which then is scaled to actual window size)
+    PhysicsManager physicsManager;
+    AudioManager audioManager;
     Ball ball;
     Level level;
     float time;

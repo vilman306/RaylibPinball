@@ -7,15 +7,15 @@ Ball::Ball()
 {
     velocity = {0.0f, 20.0f};
     color = RED;
-    position = {0.5f*Config::virtualWidth, 0.5f*Config::virtualHeight};
+    position = {0.5f*Config::width, 0.5f*Config::height};
 }
 
 void Ball::Update(float dt)
 {
-    position += velocity * dt;
+    // position += velocity * dt;
 }
 
 void Ball::Draw()
 {
-    DrawCircle(position.x, position.y, 20.0f, color);
+    DrawCircle(position.x, position.y, radius, color);
 }

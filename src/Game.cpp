@@ -1,21 +1,27 @@
 #include "raylib.h"
+#include "raymath.h"
 #include <string>
 #include "math.h"
 #include "Game.h"
 #include "Config.h"
+#include "Vec2Extensions.h"
 
 Game::Game()
 {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(1200, 800, "Spelfönster");
-    SetTargetFPS(100);
-    renderTexture = LoadRenderTexture(Config::virtualWidth,
-                                        Config::virtualHeight);
-    
+    InitAudioDevice();
+    SetTargetFPS(120);
+    renderTexture = LoadRenderTexture(Config::width,
+                                        Config::height);
+    audioManager.Load();
+    ball.velocity = {20.0f, -20.0f};
 }
 
 Game::~Game()
 {
+    audioManager.Unload();
+    CloseAudioDevice();
     CloseWindow();
 }
 
@@ -31,6 +37,26 @@ void Game::Run()
 void Game::Update()
 {
     float dt = GetFrameTime();
+
+    if (IsKeyPressed(KEY_RIGHT))
+        ball.velocity.x += 30.0f;
+    if (IsKeyPressed(KEY_LEFT))
+        ball.velocity.x -= 30.0f;
+    if (IsKeyPressed(KEY_UP))
+        ball.velocity.y -= 30.0f;
+    if (IsKeyPressed(KEY_DOWN))
+        ball.velocity.y += 30.0f;
+
+    PhysicsManager::PhysicsEvents events = physicsManager.Update(ball, dt);
+    if (events.ballBounce){
+        float ballSpeed = Vector2Length(ball.velocity);
+        float bounceVolume = ballSpeed / PhysicsManager::MAX_BALL_SPEED;   
+        SetSoundVolume(audioManager.ballBounce, bounceVolume);
+        
+
+        PlaySound(audioManager.ballBounce);
+    }
+
     ball.Update(dt);
 }
 
@@ -45,7 +71,7 @@ void Game::Draw()
     DrawText(fps.c_str(), 10, 10, 15, PURPLE);
     // Show time
     time = GetTime();
-    DrawText(std::to_string(time).c_str(), 700, 10, 15, PURPLE);
+    DrawText(std::to_string(time).c_str(), Config::width - 100, 10, 15, PURPLE);
 
     ball.Draw();
     // -----------
@@ -58,11 +84,11 @@ void Game::DrawScaledRenderTexture()
 {
     BeginDrawing();
     ClearBackground(BLACK);
-    float scaleX = (float)GetScreenWidth() / Config::virtualWidth;
-    float scaleY = (float)GetScreenHeight() / Config::virtualHeight;
+    float scaleX = (float)GetScreenWidth() / Config::width;
+    float scaleY = (float)GetScreenHeight() / Config::height;
     float scale = std::fmin(scaleX, scaleY); // keep aspect ratio
-    float scaledWidth = Config::virtualWidth * scale;
-    float scaledHeight = Config::virtualHeight * scale;
+    float scaledWidth = Config::width * scale;
+    float scaledHeight = Config::height * scale;
     float offsetX = (GetScreenWidth() - scaledWidth) * 0.5f;
     float offsetY = (GetScreenHeight() - scaledHeight) * 0.5f;
     DrawTexturePro(renderTexture.texture, {0, 0, (float)renderTexture.texture.width, -(float)renderTexture.texture.height}, {offsetX, offsetY, scaledWidth, scaledHeight}, {0, 0}, 0.0f, WHITE);

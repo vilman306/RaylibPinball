@@ -6,8 +6,9 @@ public:
     Ball();
     void Update(float dt);
     void Draw();
-private:
-    Vector2 position;
+    float radius = 20.0f;
     Vector2 velocity;
+    Vector2 position;
+private:
     Color color;
 };
