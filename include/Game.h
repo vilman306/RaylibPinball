@@ -4,7 +4,8 @@
 #include "Level.h"
 #include "PhysicsManager.h"
 #include "AudioManager.h"
-
+#include <vector>
+#include "Box.h"
 
 class Game
 {
@@ -21,6 +22,7 @@ private:
     PhysicsManager physicsManager;
     AudioManager audioManager;
     Ball ball;
+    std::vector<Box> boxes;
     Level level;
     float time;
 };

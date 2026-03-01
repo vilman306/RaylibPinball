@@ -5,6 +5,7 @@
 #include "Game.h"
 #include "Config.h"
 #include "Vec2Extensions.h"
+#include <iostream>
 
 Game::Game()
 {
@@ -15,6 +16,7 @@ Game::Game()
     renderTexture = LoadRenderTexture(Config::gameWidth, Config::gameHeight);
     audioManager.Load();
     ball.velocity = {20.0f, -20.0f};
+    boxes.push_back(Box());
 }
 
 Game::~Game()
@@ -72,7 +74,16 @@ void Game::Draw()
     time = GetTime();
     DrawText(std::to_string(time).c_str(), Config::gameWidth - 100, 10, 15, PURPLE);
 
-    ball.Draw();
+    ball.Draw(); // Draw ball
+
+    for (Box &box : boxes) // Draw boxes
+    {
+        float dt = GetFrameTime();
+        box.rotation += PI/8.0f * dt;
+        std::cout << box.rotation << std::endl;
+        box.Draw();
+    }
+
     // -----------
     EndTextureMode();
 

@@ -11,6 +11,11 @@ inline Vector2 operator+(const Vector2 &a, const Vector2& b)
     return {a.x + b.x, a.y + b.y};
 }
 
+inline Vector2 operator/(const Vector2 &v, float f)
+{
+    return {v.x / f, v.y / f};
+}
+
 inline Vector2& operator+=(Vector2 &a, const Vector2 &b)
 {
     a.x += b.x;
