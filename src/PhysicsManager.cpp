@@ -5,18 +5,31 @@
 #include "Vec2Extensions.h"
 #include "Config.h"
 
-PhysicsManager::PhysicsEvents PhysicsManager::Update(Ball &ball, float dt)
+PhysicsEvents PhysicsManager::Update(Ball &ball, float dtGame)
 {
     PhysicsEvents events;
-    events.ballBounce = false;
+
+    // Perform a physics step 1/dt times per second
+    dtGameSum += dtGame;
+    while (dtGameSum >= dt)
+    {
+        PhysicsManager::PhysicsStep(ball, events);
+        dtGameSum -= dt;
+    }
+
+    return events;
     
-    Vector2 ballAcc = {0, GRAVITY}; // Virtual ball acceleration
+}
+
+void PhysicsManager::PhysicsStep(Ball &ball, PhysicsEvents &events)
+{
+    Vector2 ballAcc = {0, GRAVITY};  // Virtual ball acceleration
     Vector2 ballVel = ball.velocity; // Virtual ball velocity
     Vector2 ballPos = ball.position; // Virtual ball position
 
     ballVel += ballAcc * dt;
 
-    // Ball - edge collision
+    // Ball - edge collision:
     if (ballPos.y + ball.radius >= Config::gameHeight) // Ball - bottom edge
     {
         ballPos.y = Config::gameHeight - ball.radius;
@@ -43,7 +56,7 @@ PhysicsManager::PhysicsEvents PhysicsManager::Update(Ball &ball, float dt)
     }
     if (events.ballBounce == true)
     {
-        ballVel *= COLLISION_DAMPING; // Damping
+        ballVel *= COLLISION_DAMPING; // Apply damping
     }
 
     // Limit ball speed
@@ -52,12 +65,10 @@ PhysicsManager::PhysicsEvents PhysicsManager::Update(Ball &ball, float dt)
     {
         ballVel = Vector2Normalize(ballVel) * MAX_BALL_SPEED;
     }
-    
-    ballPos += ballVel;
+
+    ballPos += ballVel * dt;
 
     // Assign the ball's new velocity and position
     ball.velocity = ballVel;
     ball.position = ballPos;
-
-    return events;
 }

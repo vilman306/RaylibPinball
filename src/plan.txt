@@ -1,0 +1,18 @@
+implement "sub-step" / "fixed step" physics
+
+
+
+implement visual interpolation between physics steps
+
+if necessary: implement "swept/continuous"
+
+
+
+
+
+flippers:
+float angle
+Vector2 position
+float rotSpeedUp
+float rotSpeedDown
+bool left/right

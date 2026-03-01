@@ -9,11 +9,10 @@
 Game::Game()
 {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitWindow(1200, 800, "Spelfönster");
+    InitWindow(1200, 800, Config::windowTitle);
     InitAudioDevice();
     SetTargetFPS(120);
-    renderTexture = LoadRenderTexture(Config::gameWidth,
-                                        Config::gameHeight);
+    renderTexture = LoadRenderTexture(Config::gameWidth, Config::gameHeight);
     audioManager.Load();
     ball.velocity = {20.0f, -20.0f};
 }
@@ -39,23 +38,21 @@ void Game::Update()
     float dt = GetFrameTime();
 
     if (IsKeyPressed(KEY_RIGHT))
-        ball.velocity.x += 30.0f;
+        ball.velocity.x += 100.0f;
     if (IsKeyPressed(KEY_LEFT))
-        ball.velocity.x -= 30.0f;
+        ball.velocity.x -= 100.0f;
     if (IsKeyPressed(KEY_UP))
-        ball.velocity.y -= 30.0f;
+        ball.velocity.y -= 100.0f;
     if (IsKeyPressed(KEY_DOWN))
-        ball.velocity.y += 30.0f;
+        ball.velocity.y += 100.0f;
 
-    PhysicsManager::PhysicsEvents events = physicsManager.Update(ball, dt); // Update physics
+    PhysicsEvents events = physicsManager.Update(ball, dt); // Update physics and retrieve physics information
 
-    // Play ballBounce sound
+    // Play ballBounce sound if ball collided
     if (events.ballBounce){
         float ballSpeed = Vector2Length(ball.velocity);
         float bounceVolume = ballSpeed / PhysicsManager::MAX_BALL_SPEED;   
         SetSoundVolume(audioManager.ballBounce, bounceVolume);
-        
-
         PlaySound(audioManager.ballBounce);
     }
 
