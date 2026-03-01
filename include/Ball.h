@@ -6,7 +6,7 @@ public:
     Ball();
     void Update(float dt);
     void Draw();
-    float radius = 20.0f;
+    const float radius = 20.0f;
     Vector2 velocity;
     Vector2 position;
 private:

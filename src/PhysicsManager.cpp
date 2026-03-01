@@ -1,5 +1,4 @@
 #include "raylib.h"
-#define RAYMATH_DISABLE_CPP_OPERATORS // OBS!
 #include "raymath.h"
 #include "PhysicsManager.h"
 #include "Ball.h"
@@ -11,46 +10,54 @@ PhysicsManager::PhysicsEvents PhysicsManager::Update(Ball &ball, float dt)
     PhysicsEvents events;
     events.ballBounce = false;
     
-    Vector2 ballAcc = {0, GRAVITY};
-    ball.velocity += ballAcc * dt;
+    Vector2 ballAcc = {0, GRAVITY}; // Virtual ball acceleration
+    Vector2 ballVel = ball.velocity; // Virtual ball velocity
+    Vector2 ballPos = ball.position; // Virtual ball position
+
+    ballVel += ballAcc * dt;
 
     // Ball - edge collision
-    if (ball.position.y + ball.radius >= Config::height) // Ball - bottom edge
+    if (ballPos.y + ball.radius >= Config::gameHeight) // Ball - bottom edge
     {
-        ball.position.y = Config::height - ball.radius;
-        ball.velocity.y *= -1;
+        ballPos.y = Config::gameHeight - ball.radius;
+        ballVel.y *= -1;
         events.ballBounce = true;
     }
-    if (ball.position.y - ball.radius <= 0.0f) // Ball - upper edge
+    // if (ball.position.y - ball.radius <= 0.0f) // Ball - upper edge
+    // {
+    //     ball.position.y = ball.radius;
+    //     ball.velocity.y *= -1;
+    //     events.ballBounce = true;
+    // }
+    if (ballPos.x + ball.radius >= Config::gameWidth) // Ball - right edge
     {
-        ball.position.y = ball.radius;
-        ball.velocity.y *= -1;
+        ballPos.x = Config::gameWidth - ball.radius;
+        ballVel.x *= -1;
         events.ballBounce = true;
     }
-    if (ball.position.x + ball.radius >= Config::width) // Ball - right edge
+    if (ballPos.x - ball.radius <= 0) // Ball - left edge
     {
-        ball.position.x = Config::width - ball.radius;
-        ball.velocity.x *= -1;
+        ballPos.x = ball.radius;
+        ballVel.x *= -1;
         events.ballBounce = true;
     }
-    if (ball.position.x - ball.radius <= 0) // Ball - left edge
-    {
-        ball.position.x = ball.radius;
-        ball.velocity.x *= -1;
-        events.ballBounce = true;
-    }
-    const float colDamping = 0.7f;
     if (events.ballBounce == true)
     {
-        ball.velocity *= colDamping; // Damping
+        ballVel *= COLLISION_DAMPING; // Damping
     }
 
-    const float currentBallSpeed = Vector2Length(ball.velocity);
+    // Limit ball speed
+    const float currentBallSpeed = Vector2Length(ballVel);
     if (currentBallSpeed >= MAX_BALL_SPEED)
     {
-        ball.velocity = Vector2Normalize(ball.velocity) * MAX_BALL_SPEED;
+        ballVel = Vector2Normalize(ballVel) * MAX_BALL_SPEED;
     }
     
-    ball.position += ball.velocity;
+    ballPos += ballVel;
+
+    // Assign the ball's new velocity and position
+    ball.velocity = ballVel;
+    ball.position = ballPos;
+
     return events;
 }

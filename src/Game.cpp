@@ -12,8 +12,8 @@ Game::Game()
     InitWindow(1200, 800, "Spelfönster");
     InitAudioDevice();
     SetTargetFPS(120);
-    renderTexture = LoadRenderTexture(Config::width,
-                                        Config::height);
+    renderTexture = LoadRenderTexture(Config::gameWidth,
+                                        Config::gameHeight);
     audioManager.Load();
     ball.velocity = {20.0f, -20.0f};
 }
@@ -47,7 +47,9 @@ void Game::Update()
     if (IsKeyPressed(KEY_DOWN))
         ball.velocity.y += 30.0f;
 
-    PhysicsManager::PhysicsEvents events = physicsManager.Update(ball, dt);
+    PhysicsManager::PhysicsEvents events = physicsManager.Update(ball, dt); // Update physics
+
+    // Play ballBounce sound
     if (events.ballBounce){
         float ballSpeed = Vector2Length(ball.velocity);
         float bounceVolume = ballSpeed / PhysicsManager::MAX_BALL_SPEED;   
@@ -71,7 +73,7 @@ void Game::Draw()
     DrawText(fps.c_str(), 10, 10, 15, PURPLE);
     // Show time
     time = GetTime();
-    DrawText(std::to_string(time).c_str(), Config::width - 100, 10, 15, PURPLE);
+    DrawText(std::to_string(time).c_str(), Config::gameWidth - 100, 10, 15, PURPLE);
 
     ball.Draw();
     // -----------
@@ -84,11 +86,11 @@ void Game::DrawScaledRenderTexture()
 {
     BeginDrawing();
     ClearBackground(BLACK);
-    float scaleX = (float)GetScreenWidth() / Config::width;
-    float scaleY = (float)GetScreenHeight() / Config::height;
+    float scaleX = (float)GetScreenWidth() / Config::gameWidth;
+    float scaleY = (float)GetScreenHeight() / Config::gameHeight;
     float scale = std::fmin(scaleX, scaleY); // keep aspect ratio
-    float scaledWidth = Config::width * scale;
-    float scaledHeight = Config::height * scale;
+    float scaledWidth = Config::gameWidth * scale;
+    float scaledHeight = Config::gameHeight * scale;
     float offsetX = (GetScreenWidth() - scaledWidth) * 0.5f;
     float offsetY = (GetScreenHeight() - scaledHeight) * 0.5f;
     DrawTexturePro(renderTexture.texture, {0, 0, (float)renderTexture.texture.width, -(float)renderTexture.texture.height}, {offsetX, offsetY, scaledWidth, scaledHeight}, {0, 0}, 0.0f, WHITE);

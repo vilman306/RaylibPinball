@@ -13,4 +13,4 @@ target_include_directories(${PROJECT_NAME} PRIVATE include)
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
 
 file(COPY assets DESTINATION ${CMAKE_BINARY_DIR}) # copy assets to build directory
-target_compile_definitions(raylibtest PRIVATE RAYMATH_DISABLE_CPP_OPERATORS)
+target_compile_definitions(raylibtest PRIVATE RAYMATH_DISABLE_CPP_OPERATORS) # to avoid conflict between raymath.h and Vec2Extensions.h

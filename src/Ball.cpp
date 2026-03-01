@@ -7,7 +7,7 @@ Ball::Ball()
 {
     velocity = {0.0f, 20.0f};
     color = RED;
-    position = {0.5f*Config::width, 0.5f*Config::height};
+    position = {0.5f*Config::gameWidth, 0.5f*Config::gameHeight};
 }
 
 void Ball::Update(float dt)
