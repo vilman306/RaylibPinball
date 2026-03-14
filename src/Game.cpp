@@ -15,7 +15,6 @@ Game::Game()
     SetTargetFPS(400);
     renderTexture = LoadRenderTexture(Config::gameWidth, Config::gameHeight);
     audioManager.Load();
-    ball.velocity = {20.0f, -20.0f};
     boxes.push_back(Box());
 }
 
@@ -40,16 +39,14 @@ void Game::Update()
 {
     
     if (IsKeyPressed(KEY_RIGHT))
-    ball.velocity.x += 100.0f;
+        ball.velocity.x += 100.0f;
     if (IsKeyPressed(KEY_LEFT))
-    ball.velocity.x -= 100.0f;
+        ball.velocity.x -= 100.0f;
     if (IsKeyPressed(KEY_UP))
-    ball.velocity.y -= 100.0f;
+        ball.velocity.y -= 100.0f;
     if (IsKeyPressed(KEY_DOWN))
-    ball.velocity.y += 100.0f;
+        ball.velocity.y += 100.0f;
     
-    // const float dt = GetFrameTime();
-
     static double prevTime = GetTime();
     double time = GetTime();
     double dt = time - prevTime;
@@ -57,6 +54,13 @@ void Game::Update()
     static double dtSum = 0.0;
     dtSum += dt;
     double dtPhysics = PhysicsManager::dt;
+
+    // for fun
+    static double nextEventTime = time + 10.0;
+    if (time >= nextEventTime) {
+        ball.velocity.y += 1200.0f;
+        nextEventTime = time + 10.0;
+    }
 
     // Update physics
     PhysicsEvents physicsEvents;
@@ -70,9 +74,12 @@ void Game::Update()
     if (physicsEvents.ballBounce)
     {
         float ballSpeed = Vector2Length(ball.velocity);
-        float bounceVolume = ballSpeed / PhysicsManager::MAX_BALL_SPEED;   
-        SetSoundVolume(audioManager.ballBounce, bounceVolume);
-        PlaySound(audioManager.ballBounce);
+        float bounceVolume = ballSpeed / PhysicsManager::MAX_BALL_SPEED;
+        float minSoundLevel = 0.01f;
+        if (bounceVolume >= minSoundLevel) {
+            SetSoundVolume(audioManager.ballBounce, bounceVolume);
+            PlaySound(audioManager.ballBounce);
+        }
     }
 
     // Lerp ball position between its previous and current physical positions:
@@ -105,8 +112,8 @@ void Game::Draw()
     }
 
     // -----------
-    EndTextureMode();
 
+    EndTextureMode();
     DrawScaledRenderTexture();
 }
 

@@ -5,7 +5,7 @@
 
 Ball::Ball()
 {
-    velocity = {0.0f, 20.0f};
+    velocity = {0.0f, 0.0f};
     color = RED;
     visualPosition = {0.5f*Config::gameWidth, 0.5f*Config::gameHeight};
     physicalPosition = visualPosition;
