@@ -12,7 +12,7 @@ Game::Game()
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(1200, 800, Config::windowTitle);
     InitAudioDevice();
-    SetTargetFPS(120);
+    SetTargetFPS(400);
     renderTexture = LoadRenderTexture(Config::gameWidth, Config::gameHeight);
     audioManager.Load();
     ball.velocity = {20.0f, -20.0f};
@@ -35,30 +35,43 @@ void Game::Run()
     }
 }
 
+
 void Game::Update()
 {
-    float dt = GetFrameTime();
-
+    
     if (IsKeyPressed(KEY_RIGHT))
-        ball.velocity.x += 100.0f;
+    ball.velocity.x += 100.0f;
     if (IsKeyPressed(KEY_LEFT))
-        ball.velocity.x -= 100.0f;
+    ball.velocity.x -= 100.0f;
     if (IsKeyPressed(KEY_UP))
-        ball.velocity.y -= 100.0f;
+    ball.velocity.y -= 100.0f;
     if (IsKeyPressed(KEY_DOWN))
-        ball.velocity.y += 100.0f;
+    ball.velocity.y += 100.0f;
+    
+    const float dt = GetFrameTime();
+    static float dtSum = 0.0f;
+    dtSum += dt;
+    const float dtPhysics = PhysicsManager::dt;
 
-    PhysicsEvents events = physicsManager.Update(ball, dt); // Update physics and retrieve physics information
+    PhysicsEvents physicsEvents;
+    while (dtSum >= dtPhysics)
+    {
+        physicsEvents = physicsManager.Update(ball, dt);
+        dtSum -= dtPhysics;
+    }
 
     // Play ballBounce sound if ball collided
-    if (events.ballBounce){
+    if (physicsEvents.ballBounce)
+    {
         float ballSpeed = Vector2Length(ball.velocity);
         float bounceVolume = ballSpeed / PhysicsManager::MAX_BALL_SPEED;   
         SetSoundVolume(audioManager.ballBounce, bounceVolume);
         PlaySound(audioManager.ballBounce);
     }
 
-    ball.Update(dt);
+    // Lerp ball position between its previous and current physical positions:
+    float lerpFactor = dtSum / dtPhysics;
+    ball.visualPosition = Vector2Lerp(ball.prevPhysicalPosition, ball.physicalPosition, lerpFactor);
 }
 
 void Game::Draw()
@@ -80,7 +93,6 @@ void Game::Draw()
     {
         float dt = GetFrameTime();
         box.rotation += PI/8.0f * dt;
-        std::cout << box.rotation << std::endl;
         box.Draw();
     }
 

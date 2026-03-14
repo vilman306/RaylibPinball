@@ -25,4 +25,5 @@ private:
     std::vector<Box> boxes;
     Level level;
     float time;
+    float debugtime = 0; // remove
 };

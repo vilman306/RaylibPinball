@@ -9,23 +9,9 @@ PhysicsEvents PhysicsManager::Update(Ball &ball, float dtGame)
 {
     PhysicsEvents events;
 
-    // Perform a physics step 1/dt times per second
-    dtGameSum += dtGame;
-    while (dtGameSum >= dt)
-    {
-        PhysicsManager::PhysicsStep(ball, events);
-        dtGameSum -= dt;
-    }
-
-    return events;
-    
-}
-
-void PhysicsManager::PhysicsStep(Ball &ball, PhysicsEvents &events)
-{
-    Vector2 ballAcc = {0, GRAVITY};  // Virtual ball acceleration
-    Vector2 ballVel = ball.velocity; // Virtual ball velocity
-    Vector2 ballPos = ball.position; // Virtual ball position
+    Vector2 ballAcc = {0, GRAVITY};          // Virtual ball acceleration
+    Vector2 ballVel = ball.velocity;         // Virtual ball velocity
+    Vector2 ballPos = ball.physicalPosition; // Virtual ball position
 
     ballVel += ballAcc * dt;
 
@@ -54,9 +40,11 @@ void PhysicsManager::PhysicsStep(Ball &ball, PhysicsEvents &events)
         ballVel.x *= -1;
         events.ballBounce = true;
     }
+
+    // Apply damping if ball bounced
     if (events.ballBounce == true)
     {
-        ballVel *= COLLISION_DAMPING; // Apply damping
+        ballVel *= BOUNCE_DAMPING;
     }
 
     // Limit ball speed
@@ -68,7 +56,10 @@ void PhysicsManager::PhysicsStep(Ball &ball, PhysicsEvents &events)
 
     ballPos += ballVel * dt;
 
-    // Assign the ball's new velocity and position
+    // Assign the ball's new position and velocity
+    ball.UpdatePhysicalPosition(ballPos);
     ball.velocity = ballVel;
-    ball.position = ballPos;
+
+    stepCount += 1;
+    return events;
 }

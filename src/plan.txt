@@ -16,3 +16,8 @@ Vector2 position
 float rotSpeedUp
 float rotSpeedDown
 bool left/right
+
+other ideas:
+play as circle, objective is "climb" up like in "getting over it"
+
+1v1 play as circle, objective is ?

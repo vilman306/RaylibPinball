@@ -7,15 +7,18 @@ Ball::Ball()
 {
     velocity = {0.0f, 20.0f};
     color = RED;
-    position = {0.5f*Config::gameWidth, 0.5f*Config::gameHeight};
-}
-
-void Ball::Update(float dt)
-{
-    // position += velocity * dt;
+    visualPosition = {0.5f*Config::gameWidth, 0.5f*Config::gameHeight};
+    physicalPosition = visualPosition;
+    prevPhysicalPosition = physicalPosition;
 }
 
 void Ball::Draw()
 {
-    DrawCircle(position.x, position.y, radius, color);
+    DrawCircle(visualPosition.x, visualPosition.y, radius, color);
+}
+
+void Ball::UpdatePhysicalPosition(Vector2 newPos)
+{
+    prevPhysicalPosition = physicalPosition;
+    physicalPosition = newPos;
 }
