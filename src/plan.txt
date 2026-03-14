@@ -1,10 +1,9 @@
-implement "sub-step" / "fixed step" physics
+done - implement "sub-step" / "fixed step" physics
+done - implement visual interpolation between physics steps
 
 
 
-implement visual interpolation between physics steps
-
-if necessary: implement "swept/continuous"
+if necessary: implement "swept/continuous" collision detection
 
 
 

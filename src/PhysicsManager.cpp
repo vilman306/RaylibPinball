@@ -5,15 +5,16 @@
 #include "Vec2Extensions.h"
 #include "Config.h"
 
-PhysicsEvents PhysicsManager::Update(Ball &ball, float dtGame)
+PhysicsEvents PhysicsManager::Update(Ball &ball)
 {
     PhysicsEvents events;
-
+    
     Vector2 ballAcc = {0, GRAVITY};          // Virtual ball acceleration
     Vector2 ballVel = ball.velocity;         // Virtual ball velocity
     Vector2 ballPos = ball.physicalPosition; // Virtual ball position
-
+    
     ballVel += ballAcc * dt;
+    ballPos += ballVel * dt;
 
     // Ball - edge collision:
     if (ballPos.y + ball.radius >= Config::gameHeight) // Ball - bottom edge
@@ -54,7 +55,6 @@ PhysicsEvents PhysicsManager::Update(Ball &ball, float dtGame)
         ballVel = Vector2Normalize(ballVel) * MAX_BALL_SPEED;
     }
 
-    ballPos += ballVel * dt;
 
     // Assign the ball's new position and velocity
     ball.UpdatePhysicalPosition(ballPos);

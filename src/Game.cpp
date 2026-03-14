@@ -48,15 +48,21 @@ void Game::Update()
     if (IsKeyPressed(KEY_DOWN))
     ball.velocity.y += 100.0f;
     
-    const float dt = GetFrameTime();
-    static float dtSum = 0.0f;
-    dtSum += dt;
-    const float dtPhysics = PhysicsManager::dt;
+    // const float dt = GetFrameTime();
 
+    static double prevTime = GetTime();
+    double time = GetTime();
+    double dt = time - prevTime;
+
+    static double dtSum = 0.0;
+    dtSum += dt;
+    double dtPhysics = PhysicsManager::dt;
+
+    // Update physics
     PhysicsEvents physicsEvents;
     while (dtSum >= dtPhysics)
     {
-        physicsEvents = physicsManager.Update(ball, dt);
+        physicsEvents = physicsManager.Update(ball);
         dtSum -= dtPhysics;
     }
 
@@ -72,6 +78,8 @@ void Game::Update()
     // Lerp ball position between its previous and current physical positions:
     float lerpFactor = dtSum / dtPhysics;
     ball.visualPosition = Vector2Lerp(ball.prevPhysicalPosition, ball.physicalPosition, lerpFactor);
+    // ball.visualPosition = ball.physicalPosition;
+    prevTime = time;
 }
 
 void Game::Draw()
