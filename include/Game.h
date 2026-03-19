@@ -6,6 +6,7 @@
 #include "AudioManager.h"
 #include <vector>
 #include "Box.h"
+#include "Line.h"
 
 class Game
 {
@@ -23,6 +24,7 @@ private:
     AudioManager audioManager;
     Ball ball;
     std::vector<Box> boxes;
+    std::vector<Line> lines;
     Level level;
     float time;
     float debugtime = 0; // remove

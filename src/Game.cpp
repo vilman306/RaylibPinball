@@ -6,6 +6,9 @@
 #include "Config.h"
 #include "Vec2Extensions.h"
 #include <iostream>
+#include "Line.h"
+
+
 
 Game::Game()
 {
@@ -16,6 +19,14 @@ Game::Game()
     renderTexture = LoadRenderTexture(Config::gameWidth, Config::gameHeight);
     audioManager.Load();
     boxes.push_back(Box());
+
+    
+
+    Line line{
+        {Config::gameWidth / 2.0f - 150.0f, Config::gameHeight - 200.0f},
+        {Config::gameWidth / 2.0f, Config::gameHeight - 100.0f},
+        VIOLET};
+    lines.push_back(line);
 }
 
 Game::~Game()
@@ -55,12 +66,12 @@ void Game::Update()
     dtSum += dt;
     double dtPhysics = PhysicsManager::dt;
 
-    // for fun
-    static double nextEventTime = time + 10.0;
-    if (time >= nextEventTime) {
-        ball.velocity.y += 1200.0f;
-        nextEventTime = time + 10.0;
-    }
+    // // for fun
+    // static double nextEventTime = time + 10.0;
+    // if (time >= nextEventTime) {
+    //     ball.velocity.y += 1200.0f;
+    //     nextEventTime = time + 10.0;
+    // }
 
     // Update physics
     PhysicsEvents physicsEvents;
@@ -103,6 +114,9 @@ void Game::Draw()
     DrawText(std::to_string(time).c_str(), Config::gameWidth - 100, 10, 15, PURPLE);
 
     ball.Draw(); // Draw ball
+    
+    for (Line &line : lines)
+        line.Draw();
 
     for (Box &box : boxes) // Draw boxes
     {
