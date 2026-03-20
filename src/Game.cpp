@@ -8,7 +8,33 @@
 #include <iostream>
 #include "Line.h"
 
+struct Circle
+{
+    Circle(float rad, Vector2 pos, Color c) : radius(rad), position(pos), color(c)
+    {
+        
+    }
+    const float radius;
+    Vector2 position;
+    Color color;
+};
 
+struct Flipper
+{
+    Vector2 position; // rotation point
+    Circle circleRot;
+    float rotRadius = 20.0f;
+    Circle circleTip;
+    float tipRadius = 10.0f;
+    Line lineUp;
+    Line lineDown;
+    
+    float angle;
+    float minAngle = -PI / 4.0f;
+    float maxAngle = PI / 4.0f;
+    float angularSpeed = 4.0f; // rad per sec
+    int direction; // 1: left flipper, -1: right flipper
+};
 
 Game::Game()
 {
@@ -18,14 +44,10 @@ Game::Game()
     SetTargetFPS(400);
     renderTexture = LoadRenderTexture(Config::gameWidth, Config::gameHeight);
     audioManager.Load();
-    boxes.push_back(Box());
 
-    
-
-    Line line{
-        {Config::gameWidth / 2.0f - 150.0f, Config::gameHeight - 200.0f},
-        {Config::gameWidth / 2.0f, Config::gameHeight - 100.0f},
-        VIOLET};
+    Line line({Config::gameWidth / 2.0f - 150.0f, Config::gameHeight - 200.0f},
+              {Config::gameWidth / 2.0f, Config::gameHeight - 100.0f},
+              VIOLET);
     lines.push_back(line);
 }
 
@@ -77,7 +99,7 @@ void Game::Update()
     PhysicsEvents physicsEvents;
     while (dtSum >= dtPhysics)
     {
-        physicsEvents = physicsManager.Update(ball);
+        physicsEvents = physicsManager.Update(ball, lines);
         dtSum -= dtPhysics;
     }
 
@@ -96,7 +118,6 @@ void Game::Update()
     // Lerp ball position between its previous and current physical positions:
     float lerpFactor = dtSum / dtPhysics;
     ball.visualPosition = Vector2Lerp(ball.prevPhysicalPosition, ball.physicalPosition, lerpFactor);
-    // ball.visualPosition = ball.physicalPosition;
     prevTime = time;
 }
 
@@ -113,17 +134,11 @@ void Game::Draw()
     time = GetTime();
     DrawText(std::to_string(time).c_str(), Config::gameWidth - 100, 10, 15, PURPLE);
 
-    ball.Draw(); // Draw ball
+    ball.Draw();
     
     for (Line &line : lines)
         line.Draw();
 
-    for (Box &box : boxes) // Draw boxes
-    {
-        float dt = GetFrameTime();
-        box.rotation += PI/8.0f * dt;
-        box.Draw();
-    }
 
     // -----------
 

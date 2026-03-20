@@ -3,13 +3,13 @@
 #include "Vec2Extensions.h"
 #include "raymath.h"
 
-class Line
+struct Line
 {
-public:
+    Line(Vector2 pos1, Vector2 pos2, Color color);
     Vector2 pos1;
     Vector2 pos2;
     Color color;
+    Vector2 normal;
     float visualThickness = 2.0f;
     void Draw();
-    void GetNormal();
 };
