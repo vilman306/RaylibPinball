@@ -8,33 +8,42 @@
 #include <iostream>
 #include "Line.h"
 
-struct Circle
+Circle::Circle(Vector2 pos, float rad, Color c) : position(pos), radius(rad), color(c)
 {
-    Circle(float rad, Vector2 pos, Color c) : radius(rad), position(pos), color(c)
-    {
-        
-    }
-    const float radius;
-    Vector2 position;
-    Color color;
-};
 
-struct Flipper
+}
+
+void Circle::Draw()
 {
-    Vector2 position; // rotation point
-    Circle circleRot;
-    float rotRadius = 20.0f;
-    Circle circleTip;
-    float tipRadius = 10.0f;
-    Line lineUp;
-    Line lineDown;
     
-    float angle;
-    float minAngle = -PI / 4.0f;
-    float maxAngle = PI / 4.0f;
-    float angularSpeed = 4.0f; // rad per sec
-    int direction; // 1: left flipper, -1: right flipper
-};
+    DrawCircleV(position, radius, color);
+    std::cout << position.x << "  " << position.y << "  " << radius << "  " << "\n";
+}
+
+
+
+Flipper::Flipper(Vector2 rotP, Vector2 tipP, Color c)
+    : rotPos(rotP),
+      tipPos(tipP),
+      color(c),
+      circleRot(rotP, rotRadius, c),
+      circleTip(tipP, tipRadius, c),
+      lineUp(),
+      lineDown()
+{
+    Vector2 dir = Vector2Normalize(tipP - rotP);
+    Vector2 normal = {dir.y, -dir.x};
+    lineUp = Line(rotP + normal * rotRadius, tipP + normal * tipRadius, c);
+    lineDown = Line(rotP - normal * rotRadius, tipP - normal * tipRadius, c);
+}
+
+void Flipper::Draw()
+{
+    lineUp.Draw();
+    lineDown.Draw();
+    circleRot.Draw();
+    circleTip.Draw();
+}
 
 Game::Game()
 {
@@ -45,10 +54,14 @@ Game::Game()
     renderTexture = LoadRenderTexture(Config::gameWidth, Config::gameHeight);
     audioManager.Load();
 
-    Line line({Config::gameWidth / 2.0f - 150.0f, Config::gameHeight - 200.0f},
-              {Config::gameWidth / 2.0f, Config::gameHeight - 100.0f},
-              VIOLET);
-    lines.push_back(line);
+    // Line line({Config::gameWidth / 2.0f - 150.0f, Config::gameHeight - 200.0f},
+    //           {Config::gameWidth / 2.0f, Config::gameHeight - 100.0f},
+    //           VIOLET);
+    // lines.push_back(line);
+    Flipper flipper({Config::gameWidth / 2.0f - 150.0f, Config::gameHeight - 200.0f},
+                    {Config::gameWidth / 2.0f, Config::gameHeight - 100.0f},
+                    VIOLET);
+    flippers.push_back(flipper);
 }
 
 Game::~Game()
@@ -139,6 +152,8 @@ void Game::Draw()
     for (Line &line : lines)
         line.Draw();
 
+    for (Flipper &flipper : flippers)
+        flipper.Draw();
 
     // -----------
 

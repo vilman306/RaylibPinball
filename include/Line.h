@@ -5,11 +5,12 @@
 
 struct Line
 {
+    Line() = default;
     Line(Vector2 pos1, Vector2 pos2, Color color);
     Vector2 pos1;
     Vector2 pos2;
     Color color;
     Vector2 normal;
-    float visualThickness = 2.0f;
+    float visualThickness = 1.0f;
     void Draw();
 };

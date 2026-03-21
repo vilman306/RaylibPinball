@@ -17,7 +17,6 @@ public:
     static constexpr double dt = 1.0/60.0; // Fixed delta time
 
     PhysicsEvents Update(Ball &ball, std::vector<Line> &lines);
-    int getStepCount() { return stepCount; };
 private:
     int stepCount = 0; // Number of physics steps performed
 };

@@ -2,6 +2,7 @@
 #include "raylib.h"
 struct Ball
 {
+    // Should have a circle
     Ball();
     void Draw();
     void UpdatePhysicalPosition(Vector2 newPos);
