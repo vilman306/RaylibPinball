@@ -67,6 +67,31 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std:
         }
 
         // Ball - ball collision
+        for (int j = i + 1; j < balls.size(); j++)
+        {
+            Ball &ballB = balls[j];
+            Vector2 &ballBPos = ballB.physicalPosition;
+            Vector2 &ballBVel = ballB.velocity;
+            float ballBRad = ballB.circle.radius;
+
+            Vector2 posDiff = ballPos - ballBPos;
+            float posDiffLen = Vector2Length(posDiff);
+            
+            if (posDiffLen < ballRad + ballBRad)
+            {
+                events.ballBounce = true;
+                Vector2 normal = Vector2Normalize(posDiff);
+                float penetration = ballRad + ballBRad - posDiffLen;
+                ballPos += normal * 0.5f * penetration;
+                ballBPos -= normal * 0.5f * penetration;
+                Vector2 velN = normal * Vector2DotProduct(ballVel, normal);
+                Vector2 velNB = normal * Vector2DotProduct(ballBVel, normal);
+                ballVel += (velNB - velN);
+                ballBVel += (velN - velNB);
+                ballB.velocity = velN;
+                ballVel *= BOUNCE_DAMPING;
+            }
+        }
 
         // Limit ball speed
         const float currentBallSpeed = Vector2Length(ballVel);

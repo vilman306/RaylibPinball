@@ -55,6 +55,9 @@ Game::Game()
     Ball ball({Config::gameWidth / 2.0f, Config::gameHeight / 2.0f}, 20.0f, {0.0f, 0.0f}, BLUE);
     balls.push_back(ball);
 
+    Ball ball2({Config::gameWidth / 2.0f, Config::gameHeight / 2.0f - 200.0f}, 15.0f, {0.0f, 0.0f}, RED);
+    balls.push_back(ball2);
+
     Flipper flipper({Config::gameWidth / 2.0f - 150.0f, Config::gameHeight - 200.0f},
                     200.0f, VIOLET, 1);
     flippers.push_back(flipper);
@@ -75,7 +78,6 @@ void Game::Run()
         Draw();
     }
 }
-
 
 void Game::Update()
 {

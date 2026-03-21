@@ -33,6 +33,13 @@ inline Vector2& operator+=(Vector2 &a, const Vector2 &b)
     return a;
 }
 
+inline Vector2 &operator-=(Vector2 &a, const Vector2 &b)
+{
+    a.x -= b.x;
+    a.y -= b.y;
+    return a;
+}
+
 inline Vector2& operator*=(Vector2 &a, float b)
 {
     a.x *= b;

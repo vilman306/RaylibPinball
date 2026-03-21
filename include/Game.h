@@ -14,8 +14,8 @@ struct Flipper
     Vector2 rotPos; // rotation point
     float length;
     Vector2 tipPos;
-    float rotRadius = 20.0f;
-    float tipRadius = 10.0f;
+    const float rotRadius = 20.0f;
+    const float tipRadius = 10.0f;
     Circle circleRot;
     Circle circleTip;
     Line lineUp;
@@ -23,8 +23,8 @@ struct Flipper
     Color color;
 
     float angle;
-    float minAngle = -PI / 4.0f;
-    float maxAngle = PI / 4.0f;
+    const float minAngle = -PI / 4.0f;
+    const float maxAngle = PI / 4.0f;
     float angularSpeed = 4.0f; // rad per sec
     int direction;             // 1: left flipper, -1: right flipper
 };
