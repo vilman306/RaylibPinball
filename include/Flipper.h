@@ -10,8 +10,8 @@ struct Flipper
     Vector2 rotPos; // rotation point
     float length;
     Vector2 tipPos;
-    const float rotRadius = 12.0f;
-    const float tipRadius = 6.0f;
+    const float rotRadius = 15.0f;
+    const float tipRadius = 10.0f;
     Circle circleRot;
     Circle circleTip;
     Line lineUp;

@@ -4,7 +4,7 @@
 #include "Ball.h"
 #include "Vec2Extensions.h"
 #include "Config.h"
-#include "Game.h" // Replace with "Flipper.h" when Flipper has been separated from Game.h
+#include "Flipper.h"
 
 std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std::vector<Line*> &lines, std::vector<Circle*> &circles)
 {
@@ -65,10 +65,11 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std:
                 ballVel *= BOUNCE_DAMPING;
                 if (line->owner != nullptr)
                 {
+                    // If line owner is flipper and it's rotating, add velocity in normal direction with speed angularSpeed * (length from rotation point)
                     Flipper* flipper = static_cast<Flipper*>(line->owner);
-
+                    if (flipper->angle < flipper->maxAngle && flipper->angle > flipper->minAngle)
+                        ballVel += normal * flipper->angularSpeed * flipper->length * t;
                 }
-                // If line owner is flipper and flipper.rotateUp = true, add velocity in normal direction with length angularSpeed * t
             }
         }
 
@@ -96,6 +97,7 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std:
                 ballBVel += (velN - velNB);
                 ballVel *= BOUNCE_DAMPING;
                 ballBVel *= BOUNCE_DAMPING;
+                
             }
         }
 
@@ -114,6 +116,13 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std:
                 Vector2 velN = normal * Vector2DotProduct(ballVel, normal);
                 ballVel -= 2.0f * velN;
                 ballVel *= BOUNCE_DAMPING;
+                if (circle->owner != nullptr)
+                {
+                    // If line owner is flipper and it's rotating, add velocity in normal direction with speed angularSpeed * (length from rotation point)
+                    Flipper *flipper = static_cast<Flipper *>(circle->owner);
+                    if (flipper->angle < flipper->maxAngle && flipper->angle > flipper->minAngle)
+                        ballVel += normal * flipper->angularSpeed * flipper->length;
+                }
             }
         }
 
