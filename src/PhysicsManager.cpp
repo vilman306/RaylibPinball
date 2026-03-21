@@ -5,10 +5,9 @@
 #include "Vec2Extensions.h"
 #include "Config.h"
 
-std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std::vector<Line> &lines)
+std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std::vector<Line> &lines, std::vector<Circle> &circles)
 {
     std::vector<PhysicsEvents> eventsPerBall;
-    
 
     for (int i = 0; i < balls.size(); i++)
     {
@@ -88,10 +87,29 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std:
                 Vector2 velNB = normal * Vector2DotProduct(ballBVel, normal);
                 ballVel += (velNB - velN);
                 ballBVel += (velN - velNB);
-                ballB.velocity = velN;
+                ballVel *= BOUNCE_DAMPING;
+                ballBVel *= BOUNCE_DAMPING;
+            }
+        }
+
+        // Ball - circle collision
+        for (Circle &circle : circles)
+        {
+            Vector2 circlePos = circle.position;
+            float circleRad = circle.radius;
+            Vector2 posDiff = ballPos - circlePos;
+            float posDiffLen = Vector2Length(posDiff);
+            if (posDiffLen < ballRad + circleRad)
+            {
+                events.ballBounce = true;
+                Vector2 normal = Vector2Normalize(posDiff);
+                ballPos = circlePos + normal * (ballRad + circleRad);
+                Vector2 velN = normal * Vector2DotProduct(ballVel, normal);
+                ballVel -= 2.0f * velN;
                 ballVel *= BOUNCE_DAMPING;
             }
         }
+
 
         // Limit ball speed
         const float currentBallSpeed = Vector2Length(ballVel);

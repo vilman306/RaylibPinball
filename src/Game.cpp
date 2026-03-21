@@ -19,24 +19,54 @@ Flipper::Flipper(Vector2 rotP, float len, Color c, int dir)
       lineUp(),
       lineDown()
 {
-    Vector2 lineDir = {cosf(minAngle), direction * sinf(minAngle)};
+    Vector2 lineDir = {direction * cosf(angle), sinf(angle)};
     tipPos = rotPos + lineDir * length;
 
     circleTip = Circle(tipPos, tipRadius, c);
 
-    Vector2 normal = {-direction * lineDir.y, lineDir.x};
-    lineUp = Line(rotPos + normal * rotRadius, tipPos + normal * tipRadius, c);
-    lineDown = Line(rotPos - normal * rotRadius, tipPos - normal * tipRadius, c);
-    std::cout << normal.y << "\n";
+    Vector2 normal = {-direction*lineDir.y, direction*lineDir.x};
+    if (direction == 1) { // set line points in specific order so line gets wanted normal
+        lineUp = Line(rotPos + normal * rotRadius, tipPos + normal * tipRadius, c);
+        lineDown = Line(tipPos - normal * tipRadius, rotPos - normal * rotRadius, c);
+    }
+    else {
+        lineUp = Line(tipPos + normal * tipRadius, rotPos + normal * rotRadius, c);
+        lineDown = Line(rotPos - normal * rotRadius, tipPos - normal * tipRadius, c);
+    }
 }
 
-void Flipper::Draw()
+void Flipper::UpdatePositions()
 {
-    lineUp.Draw();
-    lineDown.Draw();
-    circleRot.Draw();
-    circleTip.Draw();
+    Vector2 lineDir = {direction * cosf(angle), sinf(angle)};
+    tipPos = rotPos + lineDir * length;
+
+    circleTip.position = tipPos;
+
+    Vector2 normal = {-direction * lineDir.y, direction * lineDir.x};
+    if (direction == 1)
+    { // set line points in specific order so line gets wanted normal
+        lineUp.pos1 = rotPos + normal * rotRadius;
+        lineUp.pos2 = tipPos + normal * tipRadius;
+        lineDown.pos1 = tipPos - normal * tipRadius;
+        lineDown.pos2 = rotPos - normal * rotRadius;
+    }
+    else
+    {
+        lineUp.pos1 = tipPos + normal * tipRadius; 
+        lineUp.pos2 = rotPos + normal * rotRadius;
+        lineDown.pos1 = rotPos - normal * rotRadius;
+        lineDown.pos2 = tipPos - normal * tipRadius;
+    }
+    std::cout << angle << std::endl;
 }
+
+void Flipper::UpdatePhysics(float dtPhysics)
+{
+    int rotDir = rotateUp ? 1 : -1;
+    angle = Clamp(angle + angularSpeed * rotDir * dtPhysics, minAngle, maxAngle);
+    UpdatePositions();
+}
+
 
 Game::Game()
 {
@@ -47,20 +77,35 @@ Game::Game()
     renderTexture = LoadRenderTexture(Config::gameWidth, Config::gameHeight);
     audioManager.Load();
 
-    Line line({Config::gameWidth / 2.0f - 150.0f, 200.0f},
-              {Config::gameWidth / 2.0f, 100.0f},
+    Line line({150.0f, 200.0f},
+              {300.0f, 100.0f},
               VIOLET);
     lines.push_back(line);
 
-    Ball ball({Config::gameWidth / 2.0f, Config::gameHeight / 2.0f}, 20.0f, {0.0f, 0.0f}, BLUE);
+    Ball ball({Config::gameWidth / 2.0f, Config::gameHeight / 2.0f}, 10.0f, {0.0f, 0.0f}, BLUE);
     balls.push_back(ball);
 
     Ball ball2({Config::gameWidth / 2.0f, Config::gameHeight / 2.0f - 200.0f}, 15.0f, {0.0f, 0.0f}, RED);
     balls.push_back(ball2);
 
-    Flipper flipper({Config::gameWidth / 2.0f - 150.0f, Config::gameHeight - 200.0f},
-                    200.0f, VIOLET, 1);
-    flippers.push_back(flipper);
+    Flipper flipperL({Config::gameWidth / 2.0f - 150.0f, 200.0f},
+                    100.0f, VIOLET, 1);
+    flippers.push_back(flipperL);
+    lines.push_back(flipperL.lineUp);
+    lines.push_back(flipperL.lineDown);
+    circles.push_back(flipperL.circleRot);
+    circles.push_back(flipperL.circleTip);
+
+    Flipper flipperR({Config::gameWidth / 2.0f + 150.0f, 200.0f},
+                    100.0f, VIOLET, -1);
+    flippers.push_back(flipperR);
+    lines.push_back(flipperR.lineUp);
+    lines.push_back(flipperR.lineDown);
+    circles.push_back(flipperR.circleRot);
+    circles.push_back(flipperR.circleTip);
+
+    Circle circle({Config::gameWidth / 2.0f, 10.0f}, 40.0f, BLACK);
+    circles.push_back(circle);
 }
 
 Game::~Game()
@@ -81,14 +126,24 @@ void Game::Run()
 
 void Game::Update()
 {
-    if (IsKeyPressed(KEY_RIGHT))
+    if (IsKeyPressed(KEY_D))
         balls[0].velocity.x += 200.0f;
-    if (IsKeyPressed(KEY_LEFT))
+    if (IsKeyPressed(KEY_A))
         balls[0].velocity.x -= 200.0f;
-    if (IsKeyPressed(KEY_UP))
+    if (IsKeyPressed(KEY_W))
         balls[0].velocity.y += 200.0f;
-    if (IsKeyPressed(KEY_DOWN))
+    if (IsKeyPressed(KEY_S))
         balls[0].velocity.y -= 200.0f;
+    
+    bool leftDown = IsKeyDown(KEY_LEFT);
+    bool rightDown = IsKeyDown(KEY_RIGHT);
+    for (Flipper &flipper : flippers)
+    {
+        if (flipper.direction == 1)
+            flipper.rotateUp = leftDown;
+        else
+            flipper.rotateUp = rightDown;
+    }
 
     static double prevTime = GetTime();
     double time = GetTime();
@@ -102,7 +157,10 @@ void Game::Update()
     std::vector<PhysicsEvents> physicsEventsPerBall;
     while (dtSum >= dtPhysics)
     {
-        physicsEventsPerBall = physicsManager.Update(balls, lines);
+        for (Flipper &flipper : flippers) {
+            flipper.UpdatePhysics(dtPhysics);
+        }
+        physicsEventsPerBall = physicsManager.Update(balls, lines, circles);
         dtSum -= dtPhysics;
     }
 
@@ -148,8 +206,11 @@ void Game::Draw()
     for (Line &line : lines)
         line.Draw();
 
-    for (Flipper &flipper : flippers)
-        flipper.Draw();
+    for (Circle &circle : circles)
+        circle.Draw();
+
+    // for (Flipper &flipper : flippers)
+    //     flipper.Draw();
 
     // -----------
 

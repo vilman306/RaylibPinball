@@ -27,4 +27,4 @@ void Line::Draw()
     Vector2 p4 = Utils::WorldToScreen(pos2 + offset);
     Vector2 points[4] = {p1, p2, p3, p4};
     DrawTriangleFan(points, 4, color);
-};
+}
