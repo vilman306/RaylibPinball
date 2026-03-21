@@ -1,26 +1,18 @@
 #pragma once
 #include "raylib.h"
 #include "Ball.h"
-#include "Level.h"
 #include "PhysicsManager.h"
 #include "AudioManager.h"
 #include <vector>
-#include "Line.h"
+#include "Geometry.h"
 
-struct Circle
-{
-    Circle(Vector2 pos, float rad, Color c);
-    void Draw();
-    Color color;
-    Vector2 position;
-    float radius;
-};
 
 struct Flipper
 {
-    Flipper(Vector2 rotP, Vector2 tipP, Color c);
+    Flipper(Vector2 rotP, float len, Color c, int dir);
     void Draw();
     Vector2 rotPos; // rotation point
+    float length;
     Vector2 tipPos;
     float rotRadius = 20.0f;
     float tipRadius = 10.0f;
@@ -51,9 +43,8 @@ private:
     RenderTexture2D renderTexture; // Texture to draw on (which then is scaled to actual window size)
     PhysicsManager physicsManager;
     AudioManager audioManager;
-    Ball ball;
+    std::vector<Ball> balls;
     std::vector<Line> lines;
     std::vector<Flipper> flippers;
-    Level level;
     float time;
 };

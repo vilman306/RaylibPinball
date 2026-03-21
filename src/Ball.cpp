@@ -3,22 +3,17 @@
 #include "Config.h"
 #include "Vec2Extensions.h"
 
-Ball::Ball()
+Ball::Ball(Vector2 pos, float rad, Vector2 vel, Color c)
+    : circle(pos, rad, c),
+      velocity(vel)
 {
     velocity = {0.0f, 0.0f};
-    color = RED;
-    visualPosition = {0.5f*Config::gameWidth, 0.5f*Config::gameHeight};
-    physicalPosition = visualPosition;
+    physicalPosition = circle.position;
     prevPhysicalPosition = physicalPosition;
 }
 
 void Ball::Draw()
 {
-    DrawCircle(visualPosition.x, visualPosition.y, radius, color);
+    circle.Draw();
 }
 
-void Ball::UpdatePhysicalPosition(Vector2 newPos)
-{
-    prevPhysicalPosition = physicalPosition;
-    physicalPosition = newPos;
-}

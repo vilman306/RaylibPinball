@@ -1,7 +1,7 @@
 #pragma once
 #include "Ball.h"
 #include <vector>
-#include "Line.h"
+#include "Geometry.h"
 
 struct PhysicsEvents // For use with PhysicsManager::Update
 {
@@ -16,7 +16,8 @@ public:
     static constexpr float BOUNCE_DAMPING = 0.9f;
     static constexpr double dt = 1.0/60.0; // Fixed delta time
 
-    PhysicsEvents Update(Ball &ball, std::vector<Line> &lines);
+    std::vector<PhysicsEvents> Update(std::vector<Ball> &balls, std::vector<Line> &lines);
+
 private:
     int stepCount = 0; // Number of physics steps performed
 };

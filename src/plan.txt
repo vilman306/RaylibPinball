@@ -3,20 +3,6 @@ done - implement visual interpolation between physics steps
 
 
 
-if necessary: implement "swept/continuous" collision detection
-
-
-
-
-
-flippers:
-float angle
-Vector2 position
-float rotSpeedUp
-float rotSpeedDown
-bool left/right
-
-other ideas:
-play as circle, objective is "climb" up like in "getting over it"
-
-1v1 play as circle, objective is ?
+to do:
+switch game logic to world coordinates, draw with screen coordinates ("raylib coordinates")
+complete flipper implementation
