@@ -24,7 +24,7 @@ Flipper::Flipper(Vector2 rotP, float len, Color c, int dir)
 
     circleTip = Circle(tipPos, tipRadius, c);
 
-    Vector2 normal = {-direction*lineDir.y, direction*lineDir.x};
+    Vector2 normal = {-direction * lineDir.y, direction * lineDir.x};
     if (direction == 1) { // set line points in specific order so line gets wanted normal
         lineUp = Line(rotPos + normal * rotRadius, tipPos + normal * tipRadius, c);
         lineDown = Line(tipPos - normal * tipRadius, rotPos - normal * rotRadius, c);
@@ -33,6 +33,11 @@ Flipper::Flipper(Vector2 rotP, float len, Color c, int dir)
         lineUp = Line(tipPos + normal * tipRadius, rotPos + normal * rotRadius, c);
         lineDown = Line(rotPos - normal * rotRadius, tipPos - normal * tipRadius, c);
     }
+
+    circleRot.owner = this;
+    circleTip.owner = this;
+    lineUp.owner = this;
+    lineDown.owner = this;
 }
 
 void Flipper::UpdatePositions()
@@ -45,19 +50,22 @@ void Flipper::UpdatePositions()
     Vector2 normal = {-direction * lineDir.y, direction * lineDir.x};
     if (direction == 1)
     { // set line points in specific order so line gets wanted normal
-        lineUp.pos1 = rotPos + normal * rotRadius;
-        lineUp.pos2 = tipPos + normal * tipRadius;
-        lineDown.pos1 = tipPos - normal * tipRadius;
-        lineDown.pos2 = rotPos - normal * rotRadius;
+        Vector2 newPosUp1 = rotPos + normal * rotRadius;
+        Vector2 newPosUp2 = tipPos + normal * tipRadius;
+        lineUp.UpdatePosition(newPosUp1, newPosUp2);
+        Vector2 newPosDown1 = tipPos - normal * tipRadius;
+        Vector2 newPosDown2 = rotPos - normal * rotRadius;
+        lineDown.UpdatePosition(newPosDown1, newPosDown2);
     }
     else
     {
-        lineUp.pos1 = tipPos + normal * tipRadius; 
-        lineUp.pos2 = rotPos + normal * rotRadius;
-        lineDown.pos1 = rotPos - normal * rotRadius;
-        lineDown.pos2 = tipPos - normal * tipRadius;
+        Vector2 newPosUp1 = tipPos + normal * tipRadius;
+        Vector2 newPosUp2 = rotPos + normal * rotRadius;
+        lineUp.UpdatePosition(newPosUp1, newPosUp2);
+        Vector2 newPosDown1 = rotPos - normal * rotRadius;
+        Vector2 newPosDown2 = tipPos - normal * tipRadius;
+        lineDown.UpdatePosition(newPosDown1, newPosDown2);
     }
-    std::cout << angle << std::endl;
 }
 
 void Flipper::UpdatePhysics(float dtPhysics)
@@ -77,10 +85,10 @@ Game::Game()
     renderTexture = LoadRenderTexture(Config::gameWidth, Config::gameHeight);
     audioManager.Load();
 
-    Line line({150.0f, 200.0f},
-              {300.0f, 100.0f},
-              VIOLET);
-    lines.push_back(line);
+    // Line line({150.0f, 200.0f},
+    //           {300.0f, 100.0f},
+    //           VIOLET);
+    // lines.push_back(line);
 
     Ball ball({Config::gameWidth / 2.0f, Config::gameHeight / 2.0f}, 10.0f, {0.0f, 0.0f}, BLUE);
     balls.push_back(ball);
@@ -88,28 +96,30 @@ Game::Game()
     Ball ball2({Config::gameWidth / 2.0f, Config::gameHeight / 2.0f - 200.0f}, 15.0f, {0.0f, 0.0f}, RED);
     balls.push_back(ball2);
 
-    Flipper flipperL({Config::gameWidth / 2.0f - 150.0f, 200.0f},
+    Flipper *flipperL = new Flipper({Config::gameWidth / 2.0f - 150.0f, 200.0f}, // Store on heap so that changing vector "flippers" won't change memory location of "flipperL"
                     100.0f, VIOLET, 1);
     flippers.push_back(flipperL);
-    lines.push_back(flipperL.lineUp);
-    lines.push_back(flipperL.lineDown);
-    circles.push_back(flipperL.circleRot);
-    circles.push_back(flipperL.circleTip);
+    lines.push_back(&flippers.back()->lineUp);
+    lines.push_back(&flippers.back()->lineDown);
+    circles.push_back(&flippers.back()->circleRot);
+    circles.push_back(&flippers.back()->circleTip);
 
-    Flipper flipperR({Config::gameWidth / 2.0f + 150.0f, 200.0f},
+    Flipper *flipperR = new Flipper({Config::gameWidth / 2.0f + 150.0f, 200.0f},
                     100.0f, VIOLET, -1);
     flippers.push_back(flipperR);
-    lines.push_back(flipperR.lineUp);
-    lines.push_back(flipperR.lineDown);
-    circles.push_back(flipperR.circleRot);
-    circles.push_back(flipperR.circleTip);
+    lines.push_back(&flippers.back()->lineUp);
+    lines.push_back(&flippers.back()->lineDown);
+    circles.push_back(&flippers.back()->circleRot);
+    circles.push_back(&flippers.back()->circleTip);
 
-    Circle circle({Config::gameWidth / 2.0f, 10.0f}, 40.0f, BLACK);
-    circles.push_back(circle);
+    // Circle circle({Config::gameWidth / 2.0f, 10.0f}, 40.0f, BLACK);
+    // circles.push_back(circle);
 }
 
 Game::~Game()
 {
+    for (Flipper *flipper : flippers)
+        delete flipper;
     audioManager.Unload();
     CloseAudioDevice();
     CloseWindow();
@@ -137,12 +147,12 @@ void Game::Update()
     
     bool leftDown = IsKeyDown(KEY_LEFT);
     bool rightDown = IsKeyDown(KEY_RIGHT);
-    for (Flipper &flipper : flippers)
+    for (Flipper *flipper : flippers)
     {
-        if (flipper.direction == 1)
-            flipper.rotateUp = leftDown;
+        if (flipper->direction == 1)
+            flipper->rotateUp = leftDown;
         else
-            flipper.rotateUp = rightDown;
+            flipper->rotateUp = rightDown;
     }
 
     static double prevTime = GetTime();
@@ -157,8 +167,8 @@ void Game::Update()
     std::vector<PhysicsEvents> physicsEventsPerBall;
     while (dtSum >= dtPhysics)
     {
-        for (Flipper &flipper : flippers) {
-            flipper.UpdatePhysics(dtPhysics);
+        for (Flipper *flipper : flippers) {
+            flipper->UpdatePhysics(dtPhysics);
         }
         physicsEventsPerBall = physicsManager.Update(balls, lines, circles);
         dtSum -= dtPhysics;
@@ -203,11 +213,13 @@ void Game::Draw()
     for (Ball &ball : balls)
         ball.Draw();
     
-    for (Line &line : lines)
-        line.Draw();
+    for (Line *line : lines) {
+        std::cout << line->pos1.y << "    " << line->pos2.y << "\n";
+        line->Draw();
+    }
 
-    for (Circle &circle : circles)
-        circle.Draw();
+    for (Circle *circle : circles)
+        circle->Draw();
 
     // for (Flipper &flipper : flippers)
     //     flipper.Draw();

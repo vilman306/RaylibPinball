@@ -4,8 +4,9 @@
 #include "Ball.h"
 #include "Vec2Extensions.h"
 #include "Config.h"
+#include "Game.h" // Replace with "Flipper.h" when Flipper has been separated from Game.h
 
-std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std::vector<Line> &lines, std::vector<Circle> &circles)
+std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std::vector<Line*> &lines, std::vector<Circle*> &circles)
 {
     std::vector<PhysicsEvents> eventsPerBall;
 
@@ -47,13 +48,13 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std:
         }
 
         // Ball - line collision
-        for (Line &line : lines)
+        for (Line *line : lines)
         {
-            Vector2 normal = line.normal;
-            Vector2 v1 = ballPos - line.pos1;
-            Vector2 v2 = line.pos2 - line.pos1;
+            Vector2 normal = line->normal;
+            Vector2 v1 = ballPos - line->pos1;
+            Vector2 v2 = line->pos2 - line->pos1;
             float t = Clamp(Vector2DotProduct(v1, v2) / Vector2LengthSqr(v2), 0.0f, 1.0f);
-            Vector2 p = line.pos1 + t * v2; // Ball's "clamped" projection on line
+            Vector2 p = line->pos1 + t * v2; // Ball's "clamped" projection on line
             float d = Vector2Length(ballPos - p);
             if (d < ballRad)
             {
@@ -62,6 +63,12 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std:
                 Vector2 velN = normal * Vector2DotProduct(ballVel, normal);
                 ballVel = ballVel - 2.0f * velN;
                 ballVel *= BOUNCE_DAMPING;
+                if (line->owner != nullptr)
+                {
+                    Flipper* flipper = static_cast<Flipper*>(line->owner);
+
+                }
+                // If line owner is flipper and flipper.rotateUp = true, add velocity in normal direction with length angularSpeed * t
             }
         }
 
@@ -93,10 +100,10 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std:
         }
 
         // Ball - circle collision
-        for (Circle &circle : circles)
+        for (Circle *circle : circles)
         {
-            Vector2 circlePos = circle.position;
-            float circleRad = circle.radius;
+            Vector2 circlePos = circle->position;
+            float circleRad = circle->radius;
             Vector2 posDiff = ballPos - circlePos;
             float posDiffLen = Vector2Length(posDiff);
             if (posDiffLen < ballRad + circleRad)

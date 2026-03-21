@@ -1,6 +1,7 @@
 #include "raylib.h"
 #include "Geometry.h"
 #include "Utils.h"
+#include <iostream>
 
 Circle::Circle(Vector2 pos, float rad, Color c) : position(pos), radius(rad), color(c)
 {
@@ -27,4 +28,12 @@ void Line::Draw()
     Vector2 p4 = Utils::WorldToScreen(pos2 + offset);
     Vector2 points[4] = {p1, p2, p3, p4};
     DrawTriangleFan(points, 4, color);
+}
+
+void Line::UpdatePosition(Vector2 p1, Vector2 p2)
+{
+    pos1 = p1;
+    pos2 = p2;
+    Vector2 dir = Vector2Normalize(pos2 - pos1);
+    normal = {-dir.y, dir.x};
 }
