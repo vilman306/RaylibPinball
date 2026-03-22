@@ -1,3 +1,45 @@
+todo:
+correct normal in ball - flipper line collision
+add debug mode
+lerp flippers
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Du är inne på helt rätt spår här — du har nått den punkt där din fysikmotor börjar växa ur den första, enkla datastrukturen. Det är nu du behöver ta ett designbeslut som gör resten av projektet mycket enklare att bygga vidare på.
 
 Låt mig ge dig en tydlig, praktisk och spelmotor‑inspirerad lösning.

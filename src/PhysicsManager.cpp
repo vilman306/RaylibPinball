@@ -5,6 +5,7 @@
 #include "Vec2Extensions.h"
 #include "Config.h"
 #include "Flipper.h"
+#include <iostream>
 
 std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std::vector<Line*> &lines, std::vector<Circle*> &circles)
 {
@@ -60,16 +61,26 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std:
             {
                 events.ballBounce = true;
                 ballPos = p + normal * ballRad;
-                Vector2 velN = normal * Vector2DotProduct(ballVel, normal);
-                ballVel = ballVel - 2.0f * velN;
-                ballVel *= BOUNCE_DAMPING;
+                float speedNSigned = Vector2DotProduct(ballVel, normal);
+                if (speedNSigned < 0.0f) { // To prevent bugs if flipper moves into ball while ball is traveling from flipper
+                    Vector2 velN = normal * speedNSigned;
+                    ballVel = ballVel - 2.0f * velN;
+                }
+                
+                // Flipper:
                 if (line->owner != nullptr)
                 {
-                    // If line owner is flipper and it's rotating, add velocity in normal direction with speed angularSpeed * (length from rotation point)
-                    Flipper* flipper = static_cast<Flipper*>(line->owner);
+                    // If line owner is flipper and it's rotating, add velocity with speed angularSpeed * (length from rotation point) in direction perpendicular to r (vector pointing from rotation point to p)
+                    Flipper* flipper = static_cast<Flipper*>(line->owner); // Warning! Will cause problems if line can have owners of different type than Flipper
                     if (flipper->angle < flipper->maxAngle && flipper->angle > flipper->minAngle)
+                    {
+                        // Vector2 r = p - flipper->rotPos;
+                        // Vector2 rNormal = {-r.y, r.x};
                         ballVel += normal * flipper->angularSpeed * flipper->length * t;
+                    }
                 }
+
+                ballVel *= BOUNCE_DAMPING;
             }
         }
 
@@ -113,16 +124,22 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std:
                 events.ballBounce = true;
                 Vector2 normal = Vector2Normalize(posDiff);
                 ballPos = circlePos + normal * (ballRad + circleRad);
-                Vector2 velN = normal * Vector2DotProduct(ballVel, normal);
-                ballVel -= 2.0f * velN;
-                ballVel *= BOUNCE_DAMPING;
+
+                float speedNSigned = Vector2DotProduct(ballVel, normal);
+                if (speedNSigned < 0.0f) { // To prevent bugs if flipper moves into ball while ball is traveling from flipper
+                    Vector2 velN = normal * speedNSigned;
+                    ballVel -= 2.0f * velN;
+                }
+                
                 if (circle->owner != nullptr)
                 {
                     // If line owner is flipper and it's rotating, add velocity in normal direction with speed angularSpeed * (length from rotation point)
                     Flipper *flipper = static_cast<Flipper *>(circle->owner);
-                    if (flipper->angle < flipper->maxAngle && flipper->angle > flipper->minAngle)
-                        ballVel += normal * flipper->angularSpeed * flipper->length;
+                    // if (flipper->angle < flipper->maxAngle && flipper->angle > flipper->minAngle)
+                    //     ballVel += normal * flipper->angularSpeed * flipper->length;
                 }
+
+                ballVel *= BOUNCE_DAMPING;
             }
         }
 

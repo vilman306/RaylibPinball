@@ -8,7 +8,7 @@
 #include <iostream>
 #include "Geometry.h"
 
-
+#define DEBUG
 
 
 Game::Game()
@@ -25,22 +25,22 @@ Game::Game()
     //           VIOLET);
     // lines.push_back(line);
 
-    Ball ball({Config::gameWidth / 2.0f, Config::gameHeight / 2.0f}, 10.0f, {0.0f, 0.0f}, BLUE);
+    Ball ball({Config::gameWidth / 2.0f - 480.0f, 350.0f}, 20.0f, {0.0f, 0.0f}, BLUE);
     balls.push_back(ball);
 
-    Ball ball2({Config::gameWidth / 2.0f, Config::gameHeight / 2.0f - 200.0f}, 15.0f, {0.0f, 0.0f}, RED);
-    balls.push_back(ball2);
+    // Ball ball2({Config::gameWidth / 2.0f, 50.0f}, 15.0f, {0.0f, 0.0f}, RED);
+    // balls.push_back(ball2);
 
-    Flipper *flipperL = new Flipper({Config::gameWidth / 2.0f - 150.0f, 200.0f}, // Store on heap so that changing vector "flippers" won't change memory location of "flipperL"
-                    140.0f, VIOLET, 1);
+    Flipper *flipperL = new Flipper({Config::gameWidth / 2.0f - 500.0f, 300.0f}, // Store on heap so that changing vector "flippers" won't change memory location of "flipperL"
+                    600.0f, VIOLET, 1);
     flippers.push_back(flipperL);
     lines.push_back(&flippers.back()->lineUp);
     lines.push_back(&flippers.back()->lineDown);
     circles.push_back(&flippers.back()->circleRot);
     circles.push_back(&flippers.back()->circleTip);
 
-    Flipper *flipperR = new Flipper({Config::gameWidth / 2.0f + 150.0f, 200.0f},
-                    140.0f, VIOLET, -1);
+    Flipper *flipperR = new Flipper({Config::gameWidth / 2.0f + 500.0f, 300.0f},
+                    600.0f, VIOLET, -1);
     flippers.push_back(flipperR);
     lines.push_back(&flippers.back()->lineUp);
     lines.push_back(&flippers.back()->lineDown);
@@ -79,7 +79,11 @@ void Game::Update()
         balls[0].velocity.y += 200.0f;
     if (IsKeyPressed(KEY_S))
         balls[0].velocity.y -= 200.0f;
-    
+    if (IsKeyPressed(KEY_SPACE)) {
+        balls[0].physicalPosition = {Config::gameWidth / 2.0f - 70.0f, 200.0f};
+        balls[0].velocity = {0.0f, 0.0f};
+    }
+
     bool leftDown = IsKeyDown(KEY_LEFT);
     bool rightDown = IsKeyDown(KEY_RIGHT);
     for (Flipper *flipper : flippers)
@@ -93,6 +97,9 @@ void Game::Update()
     static double prevTime = GetTime();
     double time = GetTime();
     double dt = time - prevTime;
+    #ifdef DEBUG
+        dt = fmin(dt, PhysicsManager::dt / 4.0);
+    #endif
 
     static double dtSum = 0.0;
     dtSum += dt;
@@ -149,7 +156,6 @@ void Game::Draw()
         ball.Draw();
     
     for (Line *line : lines) {
-        std::cout << line->pos1.y << "    " << line->pos2.y << "\n";
         line->Draw();
     }
 
