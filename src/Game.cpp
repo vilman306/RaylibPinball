@@ -98,7 +98,7 @@ void Game::Update()
     double time = GetTime();
     double dt = time - prevTime;
     #ifdef DEBUG
-        dt = fmin(dt, PhysicsManager::dt / 4.0);
+        dt = fmin(dt, Config::dtDebug);
     #endif
 
     static double dtSum = 0.0;
