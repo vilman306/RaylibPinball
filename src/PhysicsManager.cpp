@@ -22,6 +22,7 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std:
         Vector2 ballPos = ball.physicalPosition; // Virtual ball position
         float ballRad = ball.circle.radius;
 
+
         ballVel += ballAcc * dt;
         ballPos += ballVel * dt;
 
@@ -30,6 +31,13 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std:
         {
             events.ballBounce = true;
             ballPos.y = ballRad;
+            ballVel.y *= -1;
+            ballVel *= BOUNCE_DAMPING;
+        }
+        if (ballPos.y + ballRad > Config::gameHeight) // Ball - upper edge
+        {
+            events.ballBounce = true;
+            ballPos.y = Config::gameHeight - ballRad;
             ballVel.y *= -1;
             ballVel *= BOUNCE_DAMPING;
         }
@@ -48,10 +56,40 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std:
             ballVel *= BOUNCE_DAMPING;
         }
 
+        // Ball - circle collision
+        for (Circle *circle : circles)
+        {
+            Vector2 circlePos = circle->position;
+            float circleRad = circle->radius;
+            Vector2 posDiff = ballPos - circlePos;
+            float posDiffLen = Vector2Length(posDiff);
+            if (posDiffLen < ballRad + circleRad)
+            {
+                events.ballBounce = true;
+                Vector2 normal = Vector2Normalize(posDiff);
+                ballPos = circlePos + normal * (ballRad + circleRad);
+
+                float signedSpeedN = Vector2DotProduct(ballVel, normal);
+                if (signedSpeedN < 0.0f)
+                { // To prevent bugs if flipper moves into ball while ball is traveling from flipper
+                    Vector2 velN = normal * signedSpeedN;
+                    ballVel -= 2.0f * velN;
+                }
+
+                if (circle->owner != nullptr)
+                {
+                    // If line owner is flipper and it's rotating, add velocity in normal direction with speed angularSpeed * (length from rotation point)
+                    Flipper *flipper = static_cast<Flipper *>(circle->owner);
+                    // if (flipper->angle < flipper->maxAngle && flipper->angle > flipper->minAngle)
+                    //     ballVel += normal * flipper->angularSpeed * flipper->length;
+                }
+
+            }
+        }
+
         // Ball - line collision
         for (Line *line : lines)
         {
-            Vector2 normal = line->normal;
             Vector2 v1 = ballPos - line->pos1;
             Vector2 v2 = line->pos2 - line->pos1;
             float t = Clamp(Vector2DotProduct(v1, v2) / Vector2LengthSqr(v2), 0.0f, 1.0f);
@@ -60,11 +98,12 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std:
             if (d < ballRad)
             {
                 events.ballBounce = true;
+                Vector2 normal = line->normal;
                 ballPos = p + normal * ballRad;
-                float speedNSigned = Vector2DotProduct(ballVel, normal);
-                if (speedNSigned < 0.0f) { // To prevent bugs if flipper moves into ball while ball is traveling from flipper
-                    Vector2 velN = normal * speedNSigned;
-                    ballVel = ballVel - 2.0f * velN;
+                float signedSpeedN = Vector2DotProduct(ballVel, normal);
+                if (signedSpeedN < 0.0f) { // To prevent bugs if flipper moves into ball while ball is traveling from flipper
+                    Vector2 velN = normal * signedSpeedN;
+                    ballVel -= 2.0f * velN;
                 }
                 
                 // Flipper:
@@ -74,13 +113,31 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std:
                     Flipper* flipper = static_cast<Flipper*>(line->owner); // Warning! Will cause problems if line can have owners of different type than Flipper
                     if (flipper->angle < flipper->maxAngle && flipper->angle > flipper->minAngle)
                     {
-                        // Vector2 r = p - flipper->rotPos;
-                        // Vector2 rNormal = {-r.y, r.x};
-                        ballVel += normal * flipper->angularSpeed * flipper->length * t;
+                        Vector2 r = p - flipper->rotPos;
+                        float rLen = Vector2Length(r);
+                        
+                        Vector2 rNormal = {-r.y, r.x};
+                        int flipperDir = flipper->direction;
+                        if (line->role == Line::LineRole::FlipperUp) {
+                            rNormal *= flipper->direction;
+                        }
+                        else {
+                            rNormal *= -flipperDir;
+                        }
+
+                        float linearSpeed = flipper->angularSpeed * rLen;
+                        Vector2 linearVel = rNormal * linearSpeed;
+
+                        // Add only the component that pushes the ball outward
+                        float push = Vector2DotProduct(linearVel, normal);
+                        if (push > 0.0f) {
+                            float tuning = 0.1f;
+                            ballVel += normal * push * tuning;
+                        }
                     }
                 }
 
-                ballVel *= BOUNCE_DAMPING;
+
             }
         }
 
@@ -112,36 +169,6 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std:
             }
         }
 
-        // Ball - circle collision
-        for (Circle *circle : circles)
-        {
-            Vector2 circlePos = circle->position;
-            float circleRad = circle->radius;
-            Vector2 posDiff = ballPos - circlePos;
-            float posDiffLen = Vector2Length(posDiff);
-            if (posDiffLen < ballRad + circleRad)
-            {
-                events.ballBounce = true;
-                Vector2 normal = Vector2Normalize(posDiff);
-                ballPos = circlePos + normal * (ballRad + circleRad);
-
-                float speedNSigned = Vector2DotProduct(ballVel, normal);
-                if (speedNSigned < 0.0f) { // To prevent bugs if flipper moves into ball while ball is traveling from flipper
-                    Vector2 velN = normal * speedNSigned;
-                    ballVel -= 2.0f * velN;
-                }
-                
-                if (circle->owner != nullptr)
-                {
-                    // If line owner is flipper and it's rotating, add velocity in normal direction with speed angularSpeed * (length from rotation point)
-                    Flipper *flipper = static_cast<Flipper *>(circle->owner);
-                    // if (flipper->angle < flipper->maxAngle && flipper->angle > flipper->minAngle)
-                    //     ballVel += normal * flipper->angularSpeed * flipper->length;
-                }
-
-                ballVel *= BOUNCE_DAMPING;
-            }
-        }
 
 
         // Limit ball speed

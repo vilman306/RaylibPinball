@@ -22,6 +22,6 @@ struct Flipper
     const float minAngle = -PI / 6.0f;
     const float maxAngle = PI / 4.0f;
     float angle = minAngle;
-    float angularSpeed = 8.0f; // rad per sec
+    float angularSpeed = 16.0f; // rad per sec
     int direction;              // 1: left flipper, -1: right flipper
 };

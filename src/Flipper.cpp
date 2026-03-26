@@ -31,13 +31,14 @@ Flipper::Flipper(Vector2 rotP, float len, Color c, int dir)
     circleTip.owner = this;
     lineUp.owner = this;
     lineDown.owner = this;
+    lineUp.role = Line::LineRole::FlipperUp;
+    lineDown.role = Line::LineRole::FlipperDown;
 }
 
 void Flipper::UpdatePositions()
 {
     Vector2 lineDir = {direction * cosf(angle), sinf(angle)};
     tipPos = rotPos + lineDir * length;
-
     circleTip.position = tipPos;
 
     Vector2 normal = {-direction * lineDir.y, direction * lineDir.x};

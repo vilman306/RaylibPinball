@@ -26,4 +26,6 @@ struct Line
     float visualThickness = 2.0f;
     void Draw();
     void *owner = nullptr;
+    enum class LineRole { Generic, FlipperUp, FlipperDown };
+    LineRole role = LineRole::Generic;
 };

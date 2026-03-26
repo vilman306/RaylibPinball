@@ -8,7 +8,7 @@
 #include <iostream>
 #include "Geometry.h"
 
-#define DEBUG
+// #define DEBUG
 
 
 Game::Game()
@@ -132,7 +132,8 @@ void Game::Update()
     float lerpFactor = dtSum / dtPhysics;
     for (Ball &ball : balls)
     {
-        ball.circle.position = Vector2Lerp(ball.prevPhysicalPosition, ball.physicalPosition, lerpFactor);
+        // ball.circle.position = Vector2Lerp(ball.prevPhysicalPosition, ball.physicalPosition, lerpFactor);
+        ball.circle.position = ball.physicalPosition;
     }
 
 
