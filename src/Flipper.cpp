@@ -1,4 +1,6 @@
 #include "Flipper.h"
+#include "Config.h"
+#include "Utils.h"
 
 Flipper::Flipper(Vector2 rotP, float len, Color c, int dir)
     : rotPos(rotP),
@@ -54,7 +56,6 @@ void Flipper::UpdateLineUpPosition(Line &line, float angle)
     }
     else
     {
-
         line.UpdatePosition(tipPos + normal * tipRadius, rotPos + normal * rotRadius);
     }
 }
@@ -75,16 +76,30 @@ void Flipper::UpdateLineDownPosition(Line &line, float angle)
 
 void Flipper::Draw()
 {
+    circleRot.Draw();
+
     Circle visualCircleTip({0.0f, 0.0f}, tipRadius, color);
+    UpdateCircleTipPosition(visualCircleTip, visualAngle);
+    visualCircleTip.Draw();
+
     Line visualLineUp({0.0f, 0.0f}, {0.0f, 0.0f}, color);
     Line visualLineDown({0.0f, 0.0f}, {0.0f, 0.0f}, color);
-    UpdateCircleTipPosition(visualCircleTip, visualAngle);
     UpdateLineUpPosition(visualLineUp, visualAngle);
     UpdateLineDownPosition(visualLineDown, visualAngle);
-    visualCircleTip.Draw();
-    visualLineUp.Draw();
-    visualLineDown.Draw();
-    circleRot.Draw();
+    Vector2 p1 = Utils::WorldToScreen(visualLineUp.pos1);
+    Vector2 p2 = Utils::WorldToScreen(visualLineDown.pos2);
+    Vector2 p3 = Utils::WorldToScreen(visualLineDown.pos1);
+    Vector2 p4 = Utils::WorldToScreen(visualLineUp.pos2);
+    Vector2 points[4] = {p1, p2, p3, p4};
+    DrawTriangleFan(points, 4, color);
+
+    // float padding = 200.0f;
+    // Vector2 leftUp = Utils::WorldToScreen({padding, Config::gameHeight - padding});
+    // Vector2 leftDown = Utils::WorldToScreen({padding, padding});
+    // Vector2 RightDown = Utils::WorldToScreen({Config::gameWidth / 2.0f - padding, padding});
+    // Vector2 RightUp = Utils::WorldToScreen({Config::gameWidth / 2.0f - padding, Config::gameHeight - padding});
+    // Rectangle testRec = {leftUp.x, leftUp.y, abs(RightDown.x - leftUp.x), abs(RightDown.y - leftUp.y)};
+    // DrawRectanglePro(testRec, {0.0f, 0.0f}, 2.03f, BROWN);
 }
 
 

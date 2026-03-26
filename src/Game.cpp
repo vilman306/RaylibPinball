@@ -19,7 +19,7 @@ Game::Game()
     float gameWidth = Config::gameWidth;
     float gameHeight = Config::gameHeight;
     InitWindow(windowX, windowY, Config::windowTitle);
-    // ToggleFullscreen();
+    MaximizeWindow();
     InitAudioDevice();
     SetTargetFPS(400);
     audioManager.Load();
@@ -28,31 +28,31 @@ Game::Game()
     //           {300.0f, 100.0f},
     //           VIOLET);
     // lines.push_back(line);
-
+    
     Ball *ball = new Ball({gameWidth / 2.0f - 480.0f, 350.0f}, 10.0f, {0.0f, 0.0f}, BLUE);
     balls.push_back(ball);
-
+    
     Ball *ball2 = new Ball({gameWidth / 2.0f, 300.0f}, 15.0f, {0.0f, 0.0f}, RED);
     balls.push_back(ball2);
-
+    
     float flipperLen = 80.0f;
     float flipperSepDistX = 0.0f;
     Flipper *flipperL = new Flipper({gameWidth / 2.0f - (flipperLen + flipperSepDistX), 300.0f}, // Store on heap so that adding to "flippers" won't change memory location of "flipperL"
-                                    flipperLen, VIOLET, 1);
+    flipperLen, VIOLET, 1);
     flippers.push_back(flipperL);
     lines.push_back(&flipperL->lineUp);
     lines.push_back(&flipperL->lineDown);
     circles.push_back(&flipperL->circleRot);
     circles.push_back(&flipperL->circleTip);
-
+    
     Flipper *flipperR = new Flipper({gameWidth / 2.0f + (flipperLen + flipperSepDistX), 300.0f},
-                                    flipperLen, VIOLET, -1);
+    flipperLen, VIOLET, -1);
     flippers.push_back(flipperR);
     lines.push_back(&flipperR->lineUp);
     lines.push_back(&flipperR->lineDown);
     circles.push_back(&flipperR->circleRot);
     circles.push_back(&flipperR->circleTip);
-
+    
     // Circle circle({gameWidth / 2.0f, 10.0f}, 40.0f, BLACK);
     // circles.push_back(circle);
 }
@@ -154,44 +154,32 @@ void Game::Draw()
 {
     BeginDrawing();
 
-    ClearBackground(DARKGRAY);
-    
-    // // Show fps
-    // std::string fps = std::to_string(GetFPS());
-    // DrawText(fps.c_str(), 10, 10, 15, PURPLE);
-    // // Show time
-    // time = GetTime();
-    // DrawText(std::to_string(time).c_str(), Config::gameWidth / 2.0f, Config::gameHeight / 2.0f, 15, PURPLE);
-    int screenWidth = GetScreenWidth();
-    int screenHeight = GetScreenHeight();
-    float gameWidth = Config::gameWidth;
-    float gameHeight = Config::gameHeight;
-    camera.offset = {screenWidth / 2.0f, screenHeight / 2.0f};
-    camera.zoom = std::min(screenWidth / gameWidth, screenHeight / gameHeight);
-    BeginMode2D(camera);
-        for (Ball *ball : balls)
-            ball->Draw();
+        ClearBackground(DARKGRAY);
+        int screenWidth = GetScreenWidth();
+        int screenHeight = GetScreenHeight();
+        float gameWidth = Config::gameWidth;
+        float gameHeight = Config::gameHeight;
 
-        for (Flipper *flipper : flippers)
-            flipper->Draw();
-        Vector2 circlePos = {gameWidth / 2.0f, gameHeight / 2.0f};
-        DrawCircleV(circlePos, 5.0f, ORANGE);
-    EndMode2D();
+        // Show fps
+        std::string fps = std::to_string(GetFPS());
+        DrawText(fps.c_str(), 10, 10, 15, PURPLE);
+        // Show time
+        time = GetTime();
+        DrawText(std::to_string(time).c_str(), screenWidth - 80, 10, 15, PURPLE);
+
+        camera.offset = {screenWidth / 2.0f, screenHeight / 2.0f};
+        camera.zoom = std::min(screenWidth / gameWidth, screenHeight / gameHeight);
+
+        BeginMode2D(camera);
+        
+            for (Ball *ball : balls)
+                ball->Draw();
+
+            for (Flipper *flipper : flippers)
+                flipper->Draw();
+
+        EndMode2D();
 
     EndDrawing();
 }
 
-// void Game::DrawScaledRenderTexture()
-// {
-//     BeginDrawing();
-//     ClearBackground(BLACK);
-//     float scaleX = (float)GetScreenWidth() / Config::gameWidth;
-//     float scaleY = (float)GetScreenHeight() / Config::gameHeight;
-//     float scale = std::fmin(scaleX, scaleY); // keep aspect ratio
-//     float scaledWidth = Config::gameWidth * scale;
-//     float scaledHeight = Config::gameHeight * scale;
-//     float offsetX = (GetScreenWidth() - scaledWidth) * 0.5f;
-//     float offsetY = (GetScreenHeight() - scaledHeight) * 0.5f;
-//     DrawTexturePro(renderTexture.texture, {0, 0, (float)renderTexture.texture.width, -(float)renderTexture.texture.height}, {offsetX, offsetY, scaledWidth, scaledHeight}, {0, 0}, 0.0f, WHITE);
-//     EndDrawing();
-// }
