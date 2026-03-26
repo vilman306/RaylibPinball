@@ -31,16 +31,18 @@ Game::Game()
     Ball *ball2 = new Ball({Config::gameWidth / 2.0f, 300.0f}, 15.0f, {0.0f, 0.0f}, RED);
     balls.push_back(ball2);
 
-    Flipper *flipperL = new Flipper({Config::gameWidth / 2.0f - 100.0f, 300.0f}, // Store on heap so that adding to "flippers" won't change memory location of "flipperL"
-                    1000.0f, VIOLET, 1);
+    float flipperLen = 400.0f;
+    float flipperPaddingX = 100.0f;
+    Flipper *flipperL = new Flipper({Config::gameWidth / 2.0f - (flipperLen + flipperPaddingX), 300.0f}, // Store on heap so that adding to "flippers" won't change memory location of "flipperL"
+                                    flipperLen, VIOLET, 1);
     flippers.push_back(flipperL);
     lines.push_back(&flipperL->lineUp);
     lines.push_back(&flipperL->lineDown);
     circles.push_back(&flipperL->circleRot);
     circles.push_back(&flipperL->circleTip);
 
-    Flipper *flipperR = new Flipper({Config::gameWidth / 2.0f + 100.0f, 300.0f},
-                    1000.0f, VIOLET, -1);
+    Flipper *flipperR = new Flipper({Config::gameWidth / 2.0f + (flipperLen + flipperPaddingX), 300.0f},
+                                    flipperLen, VIOLET, -1);
     flippers.push_back(flipperR);
     lines.push_back(&flipperR->lineUp);
     lines.push_back(&flipperR->lineDown);

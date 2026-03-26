@@ -6,7 +6,7 @@ Flipper::Flipper(Vector2 rotP, float len, Color c, int dir)
       color(c),
       direction(dir),
       circleRot(rotP, rotRadius, c),
-      circleTip(),
+      circleTip({0.0f, 0.0f}, tipRadius, c),
       lineUp(),
       lineDown()
 {
@@ -29,6 +29,8 @@ Flipper::Flipper(Vector2 rotP, float len, Color c, int dir)
 
     circleRot.owner = this;
     circleTip.owner = this;
+    circleRot.role = Circle::CircleRole::FlipperRot;
+    circleTip.role = Circle::CircleRole::FlipperTip;
     lineUp.owner = this;
     lineDown.owner = this;
     lineUp.role = Line::LineRole::FlipperUp;

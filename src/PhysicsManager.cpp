@@ -63,6 +63,7 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*> &balls, std
             float circleRad = circle->radius;
             Vector2 posDiff = ballPos - circlePos;
             float posDiffLen = Vector2Length(posDiff);
+            std::cout << circleRad << std::endl;
             if (posDiffLen < ballRad + circleRad)
             {
                 events.ballBounce = true;
@@ -76,13 +77,32 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*> &balls, std
                     ballVel -= 2.0f * velN;
                 }
 
-                if (circle->owner == nullptr)
+                if (circle->role != Circle::CircleRole::FlipperTip)
                     continue;
-                
-                Flipper *flipper = static_cast<Flipper*>(circle->owner);
-                // if (flipper->physicalAngle < flipper->maxAngle && flipper->physicalAngle > flipper->minAngle)
-                //     ballVel += normal * flipper->angularSpeed * flipper->length;
 
+                Flipper *flipper = static_cast<Flipper*>(circle->owner); // Warning! Will cause problems if line can have owners of different type than Flipper
+                if (!(flipper->physicalAngle < flipper->maxAngle && flipper->physicalAngle > flipper->minAngle))
+                    continue;
+
+                // Implement flipper "bounce"
+
+                Vector2 p = circlePos + normal * circleRad;
+                Vector2 r = p - flipper->rotPos;
+                float rLen = Vector2Length(r);
+
+                int flipperDir = flipper->direction;
+                Vector2 rNormal = {-r.y, r.x};
+                rNormal = Vector2Normalize(flipperDir * rNormal);
+
+                float rSpeed = flipper->angularSpeed * rLen;
+                Vector2 rVel = rNormal * rSpeed * flipper->rotDir;
+
+                // Add only the component that pushes the ball outward
+                float push = Vector2DotProduct(rVel, normal);
+                if (push > 0.0f)
+                {
+                    ballVel += normal * push * ballFlipperTuning;
+                }
             }
         }
 
@@ -115,17 +135,18 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*> &balls, std
                 Vector2 r = p - flipper->rotPos;
                 float rLen = Vector2Length(r);
                 
-                int flipperDir = flipper->direction;
-                Vector2 rNormal = Vector2Normalize({-r.y, r.x}) * flipperDir;
-                if (line->role == Line::LineRole::FlipperDown) {
-                    rNormal *= -1;
-                }
+                int flipperSide = 1;
+                if (line->role == Line::LineRole::FlipperDown)
+                    flipperSide *= -1;
 
-                float linearSpeed = flipper->angularSpeed * rLen;
-                Vector2 linearVel = rNormal * linearSpeed * flipper->rotDir;
+                int flipperDir = flipper->direction;
+                Vector2 rNormal = Vector2Normalize({-r.y, r.x}) * flipperDir * flipperSide;
+
+                float rSpeed = flipper->angularSpeed * rLen;
+                Vector2 rVel = rNormal * rSpeed * flipper->rotDir * flipperSide;
 
                 // Add only the component that pushes the ball outward
-                float push = Vector2DotProduct(linearVel, normal);
+                float push = Vector2DotProduct(rVel, normal);
                 if (push > 0.0f) {
                     ballVel += normal * push * ballFlipperTuning;
                 }

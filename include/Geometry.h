@@ -12,6 +12,8 @@ struct Circle
     Vector2 position;
     float radius;
     void *owner = nullptr;
+    enum class CircleRole { Generic, FlipperRot, FlipperTip };
+    CircleRole role = CircleRole::Generic;
 };
 
 struct Line
