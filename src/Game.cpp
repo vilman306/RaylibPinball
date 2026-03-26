@@ -171,7 +171,10 @@ void Game::Draw()
         camera.zoom = std::min(screenWidth / gameWidth, screenHeight / gameHeight);
 
         BeginMode2D(camera);
-        
+            // Borders
+            DrawRectangle(-5000, 0, 5000, (int)gameHeight, BLACK);
+            DrawRectangle((int)gameWidth, 0, 5000, (int)gameHeight, BLACK);
+
             for (Ball *ball : balls)
                 ball->Draw();
 
