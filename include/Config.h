@@ -4,8 +4,8 @@
 namespace Config
 {
     // the game's (virtual) width and height
-    const int gameWidth = 3000;
-    const int gameHeight = 1400;
+    const float gameWidth = 1920;
+    const float gameHeight = 1080;
     
     constexpr const char* windowTitle = "Pinball Game";
 

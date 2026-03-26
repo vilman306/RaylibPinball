@@ -18,10 +18,11 @@ public:
     void Run();
     void Update();
     void Draw();
-    void DrawScaledRenderTexture();
+    // void DrawScaledRenderTexture();
 
 private:
-    RenderTexture2D renderTexture; // Texture to draw on (which then is scaled to actual window size)
+    // RenderTexture2D renderTexture; // Texture to draw on (which then is scaled to actual window size)
+    Camera2D camera;
     PhysicsManager physicsManager;
     AudioManager audioManager;
     std::vector<Ball*> balls; // movable
