@@ -132,8 +132,13 @@ void Game::Update()
     float lerpFactor = dtSum / dtPhysics;
     for (Ball &ball : balls)
     {
-        // ball.circle.position = Vector2Lerp(ball.prevPhysicalPosition, ball.physicalPosition, lerpFactor);
-        ball.circle.position = ball.physicalPosition;
+        ball.circle.position = Vector2Lerp(ball.prevPhysicalPosition, ball.physicalPosition, lerpFactor);
+        // ball.circle.position = ball.physicalPosition;
+    }
+    // Lerp flipper angle
+    for (Flipper *flipper : flippers)
+    {
+        flipper->visualAngle = Lerp(flipper->prevPhysicalAngle, flipper->physicalAngle, lerpFactor);
     }
 
 
@@ -156,12 +161,17 @@ void Game::Draw()
     for (Ball &ball : balls)
         ball.Draw();
     
-    for (Line *line : lines) {
-        line->Draw();
-    }
+    // // Only for testing
+    // for (Line *line : lines) {
+    //     line->Draw();
+    // }
 
-    for (Circle *circle : circles)
-        circle->Draw();
+    for (Flipper *flipper : flippers)
+        flipper->Draw();
+
+    // // Only for testing
+    // for (Circle *circle : circles)
+    //     circle->Draw();
 
     // for (Flipper &flipper : flippers)
     //     flipper.Draw();

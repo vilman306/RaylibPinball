@@ -7,7 +7,7 @@ struct Circle
 {
     Circle() = default;
     Circle(Vector2 pos, float rad, Color c);
-    void Draw();
+    void Draw(); // Should only be used for testing
     Color color;
     Vector2 position;
     float radius;
@@ -24,7 +24,7 @@ struct Line
     Color color;
     Vector2 normal; // normal.y > 0 if pos1.x < pos2.x
     float visualThickness = 2.0f;
-    void Draw();
+    void Draw(); // Should only be used for testing!
     void *owner = nullptr;
     enum class LineRole { Generic, FlipperUp, FlipperDown };
     LineRole role = LineRole::Generic;

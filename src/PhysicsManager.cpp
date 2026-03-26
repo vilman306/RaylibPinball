@@ -80,7 +80,7 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std:
                 {
                     // If line owner is flipper and it's rotating, add velocity in normal direction with speed angularSpeed * (length from rotation point)
                     Flipper *flipper = static_cast<Flipper *>(circle->owner);
-                    // if (flipper->angle < flipper->maxAngle && flipper->angle > flipper->minAngle)
+                    // if (flipper->physicalAngle < flipper->maxAngle && flipper->physicalAngle > flipper->minAngle)
                     //     ballVel += normal * flipper->angularSpeed * flipper->length;
                 }
 
@@ -111,29 +111,29 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std:
                 {
                     // If line owner is flipper and it's rotating, add velocity with speed angularSpeed * (length from rotation point) in direction perpendicular to r (vector pointing from rotation point to p)
                     Flipper* flipper = static_cast<Flipper*>(line->owner); // Warning! Will cause problems if line can have owners of different type than Flipper
-                    if (flipper->angle < flipper->maxAngle && flipper->angle > flipper->minAngle)
-                    {
-                        Vector2 r = p - flipper->rotPos;
-                        float rLen = Vector2Length(r);
-                        
-                        Vector2 rNormal = {-r.y, r.x};
-                        int flipperDir = flipper->direction;
-                        if (line->role == Line::LineRole::FlipperUp) {
-                            rNormal *= flipper->direction;
-                        }
-                        else {
-                            rNormal *= -flipperDir;
-                        }
+                    if (!(flipper->physicalAngle < flipper->maxAngle && flipper->physicalAngle > flipper->minAngle))
+                        continue;
+                    Vector2 r = p - flipper->rotPos;
+                    float rLen = Vector2Length(r);
+                    
+                    Vector2 rNormal = Vector2Normalize({-r.y, r.x});
+                    int flipperDir = flipper->direction;
+                    if (line->role == Line::LineRole::FlipperUp) {
+                        rNormal *= flipper->direction;
+                    }
+                    else {
+                        rNormal *= -flipperDir;
+                    }
 
-                        float linearSpeed = flipper->angularSpeed * rLen;
-                        Vector2 linearVel = rNormal * linearSpeed;
+                    float linearSpeed = flipper->angularSpeed * rLen;
+                    Vector2 linearVel = rNormal * linearSpeed;
 
-                        // Add only the component that pushes the ball outward
-                        float push = Vector2DotProduct(linearVel, normal);
-                        if (push > 0.0f) {
-                            float tuning = 0.1f;
-                            ballVel += normal * push * tuning;
-                        }
+                    // Add only the component that pushes the ball outward
+                    float push = Vector2DotProduct(linearVel, normal);
+                    if (push > 0.0f) {
+                        std::cout << "push" << std::endl;
+                        float tuning = 1.0f;
+                        ballVel += normal * push * tuning;
                     }
                 }
 

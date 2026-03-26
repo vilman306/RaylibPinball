@@ -10,22 +10,22 @@ Flipper::Flipper(Vector2 rotP, float len, Color c, int dir)
       lineUp(),
       lineDown()
 {
-    Vector2 lineDir = {direction * cosf(angle), sinf(angle)};
-    tipPos = rotPos + lineDir * length;
 
-    circleTip = Circle(tipPos, tipRadius, c);
+    UpdateCircleTipPosition(circleTip, physicalAngle);
+    UpdateLineUpPosition(lineUp, physicalAngle);
+    UpdateLineDownPosition(lineDown, physicalAngle);
 
-    Vector2 normal = {-direction * lineDir.y, direction * lineDir.x};
-    if (direction == 1)
-    { // set line points in specific order so line gets wanted normal
-        lineUp = Line(rotPos + normal * rotRadius, tipPos + normal * tipRadius, c);
-        lineDown = Line(tipPos - normal * tipRadius, rotPos - normal * rotRadius, c);
-    }
-    else
-    {
-        lineUp = Line(tipPos + normal * tipRadius, rotPos + normal * rotRadius, c);
-        lineDown = Line(rotPos - normal * rotRadius, tipPos - normal * tipRadius, c);
-    }
+    // Vector2 normal = {-direction * lineDir.y, direction * lineDir.x};
+    // if (direction == 1)
+    // { // set line points in specific order so line gets wanted normal
+    //     lineUp = Line(rotPos + normal * rotRadius, tipPos + normal * tipRadius, c);
+    //     lineDown = Line(tipPos - normal * tipRadius, rotPos - normal * rotRadius, c);
+    // }
+    // else
+    // {
+    //     lineUp = Line(tipPos + normal * tipRadius, rotPos + normal * rotRadius, c);
+    //     lineDown = Line(rotPos - normal * rotRadius, tipPos - normal * tipRadius, c);
+    // }
 
     circleRot.owner = this;
     circleTip.owner = this;
@@ -35,36 +35,63 @@ Flipper::Flipper(Vector2 rotP, float len, Color c, int dir)
     lineDown.role = Line::LineRole::FlipperDown;
 }
 
-void Flipper::UpdatePositions()
+void Flipper::UpdateCircleTipPosition(Circle &circle, float angle)
 {
     Vector2 lineDir = {direction * cosf(angle), sinf(angle)};
     tipPos = rotPos + lineDir * length;
-    circleTip.position = tipPos;
+    circle.position = tipPos;
+}
 
+void Flipper::UpdateLineUpPosition(Line &line, float angle)
+{
+    Vector2 lineDir = {direction * cosf(angle), sinf(angle)};
     Vector2 normal = {-direction * lineDir.y, direction * lineDir.x};
     if (direction == 1)
-    { // set line points in specific order so line gets wanted normal
-        Vector2 newPosUp1 = rotPos + normal * rotRadius;
-        Vector2 newPosUp2 = tipPos + normal * tipRadius;
-        lineUp.UpdatePosition(newPosUp1, newPosUp2);
-        Vector2 newPosDown1 = tipPos - normal * tipRadius;
-        Vector2 newPosDown2 = rotPos - normal * rotRadius;
-        lineDown.UpdatePosition(newPosDown1, newPosDown2);
+    { // set line points in specific order so line gets wanted normal direction
+        line.UpdatePosition(rotPos + normal * rotRadius, tipPos + normal * tipRadius);
     }
     else
     {
-        Vector2 newPosUp1 = tipPos + normal * tipRadius;
-        Vector2 newPosUp2 = rotPos + normal * rotRadius;
-        lineUp.UpdatePosition(newPosUp1, newPosUp2);
-        Vector2 newPosDown1 = rotPos - normal * rotRadius;
-        Vector2 newPosDown2 = tipPos - normal * tipRadius;
-        lineDown.UpdatePosition(newPosDown1, newPosDown2);
+
+        line.UpdatePosition(tipPos + normal * tipRadius, rotPos + normal * rotRadius);
     }
 }
 
+void Flipper::UpdateLineDownPosition(Line &line, float angle)
+{
+    Vector2 lineDir = {direction * cosf(angle), sinf(angle)};
+    Vector2 normal = {-direction * lineDir.y, direction * lineDir.x};
+    if (direction == 1)
+    { // set line points in specific order so line gets wanted normal direction
+        line.UpdatePosition(tipPos - normal * tipRadius, rotPos - normal * rotRadius);
+    }
+    else
+    {
+        line.UpdatePosition(rotPos - normal * rotRadius, tipPos - normal * tipRadius);
+    }
+}
+
+void Flipper::Draw()
+{
+    Circle visualCircleTip({0.0f, 0.0f}, tipRadius, color);
+    Line visualLineUp({0.0f, 0.0f}, {0.0f, 0.0f}, color);
+    Line visualLineDown({0.0f, 0.0f}, {0.0f, 0.0f}, color);
+    UpdateCircleTipPosition(visualCircleTip, visualAngle);
+    UpdateLineUpPosition(visualLineUp, visualAngle);
+    UpdateLineDownPosition(visualLineDown, visualAngle);
+    visualCircleTip.Draw();
+    visualLineUp.Draw();
+    visualLineDown.Draw();
+    circleRot.Draw();
+}
+
+
 void Flipper::UpdatePhysics(float dtPhysics)
 {
+    prevPhysicalAngle = physicalAngle;
     int rotDir = rotateUp ? 1 : -1;
-    angle = Clamp(angle + angularSpeed * rotDir * dtPhysics, minAngle, maxAngle);
-    UpdatePositions();
+    physicalAngle = Clamp(physicalAngle + angularSpeed * rotDir * dtPhysics, minAngle, maxAngle);
+    UpdateCircleTipPosition(circleTip, physicalAngle);
+    UpdateLineUpPosition(lineUp, physicalAngle);
+    UpdateLineDownPosition(lineDown, physicalAngle);
 }

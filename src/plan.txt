@@ -1,11 +1,9 @@
-todo:
-correct normal in ball - flipper line collision
-add debug mode
-lerp flippers
+
+
+
 
 
 note: line colliders must always be paired with circle colliders on each endpoint, otherwise ball - endpoint collision will be incorrect
-
 
 
 
