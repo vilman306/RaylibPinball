@@ -14,7 +14,7 @@ struct Flipper
     float length;
     Vector2 tipPos;
     const float rotRadius = 10.0f;
-    const float tipRadius = 100.0f;
+    const float tipRadius = 8.0f;
     Circle circleRot; // used in physics
     Circle circleTip; // used in physics
     Line lineUp; // used in physics

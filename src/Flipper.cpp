@@ -7,8 +7,8 @@ Flipper::Flipper(Vector2 rotP, float len, Color c, int dir)
       direction(dir),
       circleRot(rotP, rotRadius, c),
       circleTip({0.0f, 0.0f}, tipRadius, c),
-      lineUp(),
-      lineDown()
+      lineUp({0.0f, 0.0f}, {0.0f, 0.0f}, c),
+      lineDown({0.0f, 0.0f}, {0.0f, 0.0f}, c)
 {
 
     UpdateCircleTipPosition(circleTip, physicalAngle);

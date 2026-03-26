@@ -15,6 +15,7 @@ Game::Game()
 {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(1200, 800, Config::windowTitle);
+    // ToggleFullscreen();
     InitAudioDevice();
     SetTargetFPS(400);
     renderTexture = LoadRenderTexture(Config::gameWidth, Config::gameHeight);
@@ -31,9 +32,9 @@ Game::Game()
     Ball *ball2 = new Ball({Config::gameWidth / 2.0f, 300.0f}, 15.0f, {0.0f, 0.0f}, RED);
     balls.push_back(ball2);
 
-    float flipperLen = 400.0f;
-    float flipperPaddingX = 100.0f;
-    Flipper *flipperL = new Flipper({Config::gameWidth / 2.0f - (flipperLen + flipperPaddingX), 300.0f}, // Store on heap so that adding to "flippers" won't change memory location of "flipperL"
+    float flipperLen = 80.0f;
+    float flipperSepDistX = 0.0f;
+    Flipper *flipperL = new Flipper({Config::gameWidth / 2.0f - (flipperLen + flipperSepDistX), 300.0f}, // Store on heap so that adding to "flippers" won't change memory location of "flipperL"
                                     flipperLen, VIOLET, 1);
     flippers.push_back(flipperL);
     lines.push_back(&flipperL->lineUp);
@@ -41,7 +42,7 @@ Game::Game()
     circles.push_back(&flipperL->circleRot);
     circles.push_back(&flipperL->circleTip);
 
-    Flipper *flipperR = new Flipper({Config::gameWidth / 2.0f + (flipperLen + flipperPaddingX), 300.0f},
+    Flipper *flipperR = new Flipper({Config::gameWidth / 2.0f + (flipperLen + flipperSepDistX), 300.0f},
                                     flipperLen, VIOLET, -1);
     flippers.push_back(flipperR);
     lines.push_back(&flipperR->lineUp);
@@ -135,7 +136,6 @@ void Game::Update()
     for (Ball *ball : balls)
     {
         ball->circle.position = Vector2Lerp(ball->prevPhysicalPosition, ball->physicalPosition, lerpFactor);
-        // ball.circle.position = ball.physicalPosition;
     }
     // Lerp flipper angle
     for (Flipper *flipper : flippers)
@@ -152,7 +152,7 @@ void Game::Draw()
     BeginTextureMode(renderTexture);
     // Draw content:
     // -----------
-    ClearBackground(WHITE);
+    ClearBackground(DARKGRAY);
     // Show fps
     std::string fps = std::to_string(GetFPS());
     DrawText(fps.c_str(), 10, 10, 15, PURPLE);

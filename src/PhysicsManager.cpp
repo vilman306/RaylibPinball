@@ -32,28 +32,28 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*> &balls, std
             events.ballBounce = true;
             ballPos.y = ballRad;
             ballVel.y *= -1;
-            ballVel *= BOUNCE_DAMPING;
+            ballVel.y *= BOUNCE_DAMPING;
         }
         if (ballPos.y + ballRad > Config::gameHeight) // Ball - upper edge
         {
             events.ballBounce = true;
             ballPos.y = Config::gameHeight - ballRad;
             ballVel.y *= -1;
-            ballVel *= BOUNCE_DAMPING;
+            ballVel.y *= BOUNCE_DAMPING;
         }
         if (ballPos.x + ballRad > Config::gameWidth) // Ball - right edge
         {
             events.ballBounce = true;
             ballPos.x = Config::gameWidth - ballRad;
             ballVel.x *= -1;
-            ballVel *= BOUNCE_DAMPING;
+            ballVel.x *= BOUNCE_DAMPING;
         }
         if (ballPos.x - ballRad < 0.0f) // Ball - left edge
         {
             events.ballBounce = true;
             ballPos.x = ballRad;
             ballVel.x *= -1;
-            ballVel *= BOUNCE_DAMPING;
+            ballVel.x *= BOUNCE_DAMPING;
         }
 
         // Ball - circle collision
@@ -63,7 +63,6 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*> &balls, std
             float circleRad = circle->radius;
             Vector2 posDiff = ballPos - circlePos;
             float posDiffLen = Vector2Length(posDiff);
-            std::cout << circleRad << std::endl;
             if (posDiffLen < ballRad + circleRad)
             {
                 events.ballBounce = true;
