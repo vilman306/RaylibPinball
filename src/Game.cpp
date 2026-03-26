@@ -13,17 +13,27 @@
 
 Game::Game()
 {
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    int windowX = 1200;
-    int windowY = 800;
+    
+    screenWidth = 1200;
+    screenHeight = 800;
     float gameWidth = Config::gameWidth;
     float gameHeight = Config::gameHeight;
-    InitWindow(windowX, windowY, Config::windowTitle);
+    
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    InitWindow(screenWidth, screenHeight, Config::windowTitle);
     MaximizeWindow();
+    
     InitAudioDevice();
-    SetTargetFPS(400);
+
+    SetTargetFPS(targetFPS);
+
     audioManager.Load();
+    
     camera.target = {gameWidth / 2.0f, gameHeight / 2.0f};
+    camera.rotation = 0.0f;
+    
+    renderTexture = LoadRenderTexture(screenWidth, screenHeight);
+    
     // Line *line = new Line({150.0f, 200.0f},
     //           {300.0f, 100.0f},
     //           VIOLET);
@@ -61,6 +71,7 @@ Game::~Game()
 {
     for (Flipper *flipper : flippers)
         delete flipper;
+    UnloadRenderTexture(renderTexture);
     audioManager.Unload();
     CloseAudioDevice();
     CloseWindow();
@@ -101,7 +112,7 @@ void Game::Update()
     }
 
     static double prevTime = GetTime();
-    double time = GetTime();
+    time = GetTime();
     double dt = time - prevTime;
     #ifdef DEBUG
         dt = fmin(dt, Config::dtDebug);
@@ -150,30 +161,41 @@ void Game::Update()
     prevTime = time;
 }
 
+void Game::GetScreenDimensions()
+{
+    int newWidth = GetScreenWidth();
+    int newHeight = GetScreenHeight();
+    if (newWidth != screenWidth || newHeight != screenHeight)
+    {
+        screenWidth = newWidth;
+        screenHeight = newHeight;
+        UnloadRenderTexture(renderTexture);
+        renderTexture = LoadRenderTexture(screenWidth, screenHeight);
+    }
+}
+
 void Game::Draw()
 {
-    BeginDrawing();
+    GetScreenDimensions(); // Updates rendertexture if window dimensions changed
 
-        ClearBackground(DARKGRAY);
-        int screenWidth = GetScreenWidth();
-        int screenHeight = GetScreenHeight();
-        float gameWidth = Config::gameWidth;
-        float gameHeight = Config::gameHeight;
+    float gameWidth = Config::gameWidth;
+    float gameHeight = Config::gameHeight;
 
-        // Show fps
-        std::string fps = std::to_string(GetFPS());
-        DrawText(fps.c_str(), 10, 10, 15, PURPLE);
-        // Show time
-        time = GetTime();
-        DrawText(std::to_string(time).c_str(), screenWidth - 80, 10, 15, PURPLE);
+    BeginTextureMode(renderTexture);
 
-        camera.offset = {screenWidth / 2.0f, screenHeight / 2.0f};
-        camera.zoom = std::min(screenWidth / gameWidth, screenHeight / gameHeight);
+        ClearBackground(GRAY);
 
+        int textureWidth = renderTexture.texture.width;
+        int textureHeight = renderTexture.texture.height;
+        camera.offset = {textureWidth / 2.0f, textureHeight / 2.0f};
+        camera.zoom = std::min(textureWidth / gameWidth, textureHeight / gameHeight);
         BeginMode2D(camera);
             // Borders
-            DrawRectangle(-5000, 0, 5000, (int)gameHeight, BLACK);
-            DrawRectangle((int)gameWidth, 0, 5000, (int)gameHeight, BLACK);
+            int borderLen = 5000;
+            DrawRectangle(-borderLen, -borderLen, borderLen, 2 * borderLen, BLACK); // Left
+            DrawRectangle((int)gameWidth, -borderLen, borderLen, 2 * borderLen, BLACK); // Right
+            DrawRectangle(-borderLen, -borderLen, (int)gameWidth + borderLen, borderLen, BLACK); // Up
+            DrawRectangle(-borderLen, (int)gameHeight, (int)gameWidth + borderLen, borderLen, BLACK); // Bottom
 
             for (Ball *ball : balls)
                 ball->Draw();
@@ -182,6 +204,19 @@ void Game::Draw()
                 flipper->Draw();
 
         EndMode2D();
+
+        // Show fps
+        std::string fps = std::to_string(GetFPS());
+        DrawText(fps.c_str(), 10, 10, 15, PURPLE);
+        // Show time
+        DrawText(std::to_string(time).c_str(), screenWidth - 80, 10, 15, PURPLE);
+
+    EndTextureMode();
+
+
+    BeginDrawing();
+
+        DrawTexturePro(renderTexture.texture, {0, 0, (float)renderTexture.texture.width, -(float)renderTexture.texture.height}, {0, 0, (float)screenWidth, (float)screenHeight}, {0, 0}, 0.0f, WHITE);
 
     EndDrawing();
 }

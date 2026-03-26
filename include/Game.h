@@ -18,6 +18,7 @@ public:
     void Run();
     void Update();
     void Draw();
+    void GetScreenDimensions();
     // void DrawScaledRenderTexture();
 
 private:
@@ -25,9 +26,13 @@ private:
     Camera2D camera;
     PhysicsManager physicsManager;
     AudioManager audioManager;
+    RenderTexture renderTexture;
+    int screenWidth;
+    int screenHeight;
     std::vector<Ball*> balls; // movable
     std::vector<Line*> lines; // stationary (or attached to flippers)
     std::vector<Circle*> circles; // stationary (or attached to flippers)
     std::vector<Flipper*> flippers;
-    float time;
+    double time;
+    const float targetFPS = 400;
 };
