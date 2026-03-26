@@ -7,7 +7,7 @@
 #include "Flipper.h"
 #include <iostream>
 
-std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std::vector<Line*> &lines, std::vector<Circle*> &circles)
+std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*> &balls, std::vector<Line*> &lines, std::vector<Circle*> &circles)
 {
     std::vector<PhysicsEvents> eventsPerBall;
 
@@ -15,12 +15,12 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std:
     {
         PhysicsEvents events;
 
-        Ball &ball = balls[i];
+        Ball *ball = balls[i];
 
         Vector2 ballAcc = {0, -GRAVITY};          // Virtual ball acceleration
-        Vector2 ballVel = ball.velocity;         // Virtual ball velocity
-        Vector2 ballPos = ball.physicalPosition; // Virtual ball position
-        float ballRad = ball.circle.radius;
+        Vector2 ballVel = ball->velocity;         // Virtual ball velocity
+        Vector2 ballPos = ball->physicalPosition; // Virtual ball position
+        float ballRad = ball->circle.radius;
 
 
         ballVel += ballAcc * dt;
@@ -72,17 +72,16 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std:
                 float signedSpeedN = Vector2DotProduct(ballVel, normal);
                 if (signedSpeedN < 0.0f)
                 { // To prevent bugs if flipper moves into ball while ball is traveling from flipper
-                    Vector2 velN = normal * signedSpeedN;
+                    Vector2 velN = normal * signedSpeedN * BOUNCE_DAMPING;
                     ballVel -= 2.0f * velN;
                 }
 
-                if (circle->owner != nullptr)
-                {
-                    // If line owner is flipper and it's rotating, add velocity in normal direction with speed angularSpeed * (length from rotation point)
-                    Flipper *flipper = static_cast<Flipper *>(circle->owner);
-                    // if (flipper->physicalAngle < flipper->maxAngle && flipper->physicalAngle > flipper->minAngle)
-                    //     ballVel += normal * flipper->angularSpeed * flipper->length;
-                }
+                if (circle->owner == nullptr)
+                    continue;
+                
+                Flipper *flipper = static_cast<Flipper*>(circle->owner);
+                // if (flipper->physicalAngle < flipper->maxAngle && flipper->physicalAngle > flipper->minAngle)
+                //     ballVel += normal * flipper->angularSpeed * flipper->length;
 
             }
         }
@@ -106,50 +105,40 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std:
                     ballVel -= 2.0f * velN;
                 }
                 
-                // Flipper:
-                if (line->owner != nullptr)
-                {
-                    // If line owner is flipper and it's rotating, add velocity with speed angularSpeed * (length from rotation point) in direction perpendicular to r (vector pointing from rotation point to p)
-                    Flipper* flipper = static_cast<Flipper*>(line->owner); // Warning! Will cause problems if line can have owners of different type than Flipper
-                    if (!(flipper->physicalAngle < flipper->maxAngle && flipper->physicalAngle > flipper->minAngle))
-                        continue;
-                    Vector2 r = p - flipper->rotPos;
-                    float rLen = Vector2Length(r);
-                    
-                    Vector2 rNormal = Vector2Normalize({-r.y, r.x});
-                    int flipperDir = flipper->direction;
-                    if (line->role == Line::LineRole::FlipperUp) {
-                        rNormal *= flipper->direction;
-                    }
-                    else {
-                        rNormal *= -flipperDir;
-                    }
+                if (line->owner == nullptr)
+                    continue;
 
-                    float linearSpeed = flipper->angularSpeed * rLen;
-                    Vector2 linearVel = rNormal * linearSpeed;
+                Flipper *flipper = static_cast<Flipper*>(line->owner); // Warning! Will cause problems if line can have owners of different type than Flipper
+                if (!(flipper->physicalAngle < flipper->maxAngle && flipper->physicalAngle > flipper->minAngle))
+                    continue;
 
-                    // Add only the component that pushes the ball outward
-                    float push = Vector2DotProduct(linearVel, normal);
-                    if (push > 0.0f) {
-                        static int i = 0;
-                        i++;
-                        std::cout << "push" << i << std::endl;
-                        float tuning = 2.0f;
-                        ballVel += normal * push * tuning;
-                    }
+                Vector2 r = p - flipper->rotPos;
+                float rLen = Vector2Length(r);
+                
+                int flipperDir = flipper->direction;
+                Vector2 rNormal = Vector2Normalize({-r.y, r.x}) * flipperDir;
+                if (line->role == Line::LineRole::FlipperDown) {
+                    rNormal *= -1;
                 }
 
+                float linearSpeed = flipper->angularSpeed * rLen;
+                Vector2 linearVel = rNormal * linearSpeed * flipper->rotDir;
 
+                // Add only the component that pushes the ball outward
+                float push = Vector2DotProduct(linearVel, normal);
+                if (push > 0.0f) {
+                    ballVel += normal * push * ballFlipperTuning;
+                }
             }
         }
 
         // Ball - ball collision
         for (int j = i + 1; j < balls.size(); j++)
         {
-            Ball &ballB = balls[j];
-            Vector2 &ballBPos = ballB.physicalPosition;
-            Vector2 &ballBVel = ballB.velocity;
-            float ballBRad = ballB.circle.radius;
+            Ball *ballB = balls[j];
+            Vector2 &ballBPos = ballB->physicalPosition;
+            Vector2 &ballBVel = ballB->velocity;
+            float ballBRad = ballB->circle.radius;
 
             Vector2 posDiff = ballPos - ballBPos;
             float posDiffLen = Vector2Length(posDiff);
@@ -181,9 +170,9 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std:
         // }
 
         // Assign the ball's new position and velocity
-        ball.prevPhysicalPosition = ball.physicalPosition;
-        ball.physicalPosition = ballPos;
-        ball.velocity = ballVel;
+        ball->prevPhysicalPosition = ball->physicalPosition;
+        ball->physicalPosition = ballPos;
+        ball->velocity = ballVel;
 
         eventsPerBall.push_back(events);
     }

@@ -20,32 +20,32 @@ Game::Game()
     renderTexture = LoadRenderTexture(Config::gameWidth, Config::gameHeight);
     audioManager.Load();
 
-    // Line line({150.0f, 200.0f},
+    // Line *line = new Line({150.0f, 200.0f},
     //           {300.0f, 100.0f},
     //           VIOLET);
     // lines.push_back(line);
 
-    Ball ball({Config::gameWidth / 2.0f - 480.0f, 350.0f}, 20.0f, {0.0f, 0.0f}, BLUE);
+    Ball *ball = new Ball({Config::gameWidth / 2.0f - 480.0f, 350.0f}, 10.0f, {0.0f, 0.0f}, BLUE);
     balls.push_back(ball);
 
-    // Ball ball2({Config::gameWidth / 2.0f, 50.0f}, 15.0f, {0.0f, 0.0f}, RED);
-    // balls.push_back(ball2);
+    Ball *ball2 = new Ball({Config::gameWidth / 2.0f, 300.0f}, 15.0f, {0.0f, 0.0f}, RED);
+    balls.push_back(ball2);
 
-    Flipper *flipperL = new Flipper({Config::gameWidth / 2.0f - 500.0f, 300.0f}, // Store on heap so that changing vector "flippers" won't change memory location of "flipperL"
-                    600.0f, VIOLET, 1);
+    Flipper *flipperL = new Flipper({Config::gameWidth / 2.0f - 100.0f, 300.0f}, // Store on heap so that adding to "flippers" won't change memory location of "flipperL"
+                    1000.0f, VIOLET, 1);
     flippers.push_back(flipperL);
-    lines.push_back(&flippers.back()->lineUp);
-    lines.push_back(&flippers.back()->lineDown);
-    circles.push_back(&flippers.back()->circleRot);
-    circles.push_back(&flippers.back()->circleTip);
+    lines.push_back(&flipperL->lineUp);
+    lines.push_back(&flipperL->lineDown);
+    circles.push_back(&flipperL->circleRot);
+    circles.push_back(&flipperL->circleTip);
 
-    Flipper *flipperR = new Flipper({Config::gameWidth / 2.0f + 500.0f, 300.0f},
-                    600.0f, VIOLET, -1);
+    Flipper *flipperR = new Flipper({Config::gameWidth / 2.0f + 100.0f, 300.0f},
+                    1000.0f, VIOLET, -1);
     flippers.push_back(flipperR);
-    lines.push_back(&flippers.back()->lineUp);
-    lines.push_back(&flippers.back()->lineDown);
-    circles.push_back(&flippers.back()->circleRot);
-    circles.push_back(&flippers.back()->circleTip);
+    lines.push_back(&flipperR->lineUp);
+    lines.push_back(&flipperR->lineDown);
+    circles.push_back(&flipperR->circleRot);
+    circles.push_back(&flipperR->circleTip);
 
     // Circle circle({Config::gameWidth / 2.0f, 10.0f}, 40.0f, BLACK);
     // circles.push_back(circle);
@@ -72,16 +72,16 @@ void Game::Run()
 void Game::Update()
 {
     if (IsKeyPressed(KEY_D))
-        balls[0].velocity.x += 200.0f;
+        balls[0]->velocity.x += 200.0f;
     if (IsKeyPressed(KEY_A))
-        balls[0].velocity.x -= 200.0f;
+        balls[0]->velocity.x -= 200.0f;
     if (IsKeyPressed(KEY_W))
-        balls[0].velocity.y += 200.0f;
+        balls[0]->velocity.y += 200.0f;
     if (IsKeyPressed(KEY_S))
-        balls[0].velocity.y -= 200.0f;
+        balls[0]->velocity.y -= 200.0f;
     if (IsKeyPressed(KEY_SPACE)) {
-        balls[0].physicalPosition = {Config::gameWidth / 2.0f - 70.0f, 200.0f};
-        balls[0].velocity = {0.0f, 0.0f};
+        balls[0]->physicalPosition = {Config::gameWidth / 2.0f - 120.0f, 420.0f};
+        balls[0]->velocity = {100.0f, 0.0f};
     }
 
     bool leftDown = IsKeyDown(KEY_LEFT);
@@ -130,9 +130,9 @@ void Game::Update()
 
     // Lerp ball positions between its previous and current physical positions:
     float lerpFactor = dtSum / dtPhysics;
-    for (Ball &ball : balls)
+    for (Ball *ball : balls)
     {
-        ball.circle.position = Vector2Lerp(ball.prevPhysicalPosition, ball.physicalPosition, lerpFactor);
+        ball->circle.position = Vector2Lerp(ball->prevPhysicalPosition, ball->physicalPosition, lerpFactor);
         // ball.circle.position = ball.physicalPosition;
     }
     // Lerp flipper angle
@@ -158,8 +158,8 @@ void Game::Draw()
     time = GetTime();
     DrawText(std::to_string(time).c_str(), Config::gameWidth - 100, 10, 15, PURPLE);
 
-    for (Ball &ball : balls)
-        ball.Draw();
+    for (Ball *ball : balls)
+        ball->Draw();
     
     // // Only for testing
     // for (Line *line : lines) {

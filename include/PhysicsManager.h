@@ -15,8 +15,10 @@ public:
     // static constexpr float MAX_BALL_SPEED = 2000.0f; // Length (norm) of speed vector, not length squared
     static constexpr float BOUNCE_DAMPING = 0.8f;
     static constexpr double dt = 1.0/1000.0; // Fixed delta time
+    
+    const float ballFlipperTuning = 50.0f;
 
-    std::vector<PhysicsEvents> Update(std::vector<Ball> &balls, std::vector<Line*> &lines, std::vector<Circle*> &circles);
+    std::vector<PhysicsEvents> Update(std::vector<Ball*> &balls, std::vector<Line*> &lines, std::vector<Circle*> &circles);
 
 private:
     int stepCount = 0; // Number of physics steps performed

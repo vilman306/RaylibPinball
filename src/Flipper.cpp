@@ -89,7 +89,7 @@ void Flipper::Draw()
 void Flipper::UpdatePhysics(float dtPhysics)
 {
     prevPhysicalAngle = physicalAngle;
-    int rotDir = rotateUp ? 1 : -1;
+    rotDir = rotateUp ? 1 : -1;
     physicalAngle = Clamp(physicalAngle + angularSpeed * rotDir * dtPhysics, minAngle, maxAngle);
     UpdateCircleTipPosition(circleTip, physicalAngle);
     UpdateLineUpPosition(lineUp, physicalAngle);

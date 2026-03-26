@@ -24,8 +24,8 @@ private:
     RenderTexture2D renderTexture; // Texture to draw on (which then is scaled to actual window size)
     PhysicsManager physicsManager;
     AudioManager audioManager;
-    std::vector<Ball> balls; // movable
-    std::vector<Line*> lines; // stationary
+    std::vector<Ball*> balls; // movable
+    std::vector<Line*> lines; // stationary (or attached to flippers)
     std::vector<Circle*> circles; // stationary (or attached to flippers)
     std::vector<Flipper*> flippers;
     float time;
