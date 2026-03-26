@@ -102,7 +102,7 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std:
                 ballPos = p + normal * ballRad;
                 float signedSpeedN = Vector2DotProduct(ballVel, normal);
                 if (signedSpeedN < 0.0f) { // To prevent bugs if flipper moves into ball while ball is traveling from flipper
-                    Vector2 velN = normal * signedSpeedN;
+                    Vector2 velN = normal * signedSpeedN * BOUNCE_DAMPING;
                     ballVel -= 2.0f * velN;
                 }
                 
@@ -131,8 +131,10 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std:
                     // Add only the component that pushes the ball outward
                     float push = Vector2DotProduct(linearVel, normal);
                     if (push > 0.0f) {
-                        std::cout << "push" << std::endl;
-                        float tuning = 1.0f;
+                        static int i = 0;
+                        i++;
+                        std::cout << "push" << i << std::endl;
+                        float tuning = 2.0f;
                         ballVel += normal * push * tuning;
                     }
                 }
@@ -171,12 +173,12 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball> &balls, std:
 
 
 
-        // Limit ball speed
-        const float currentBallSpeed = Vector2Length(ballVel);
-        if (currentBallSpeed >= MAX_BALL_SPEED)
-        {
-            ballVel = Vector2Normalize(ballVel) * MAX_BALL_SPEED;
-        }
+        // // Limit ball speed
+        // const float currentBallSpeed = Vector2Length(ballVel);
+        // if (currentBallSpeed >= MAX_BALL_SPEED)
+        // {
+        //     ballVel = Vector2Normalize(ballVel) * MAX_BALL_SPEED;
+        // }
 
         // Assign the ball's new position and velocity
         ball.prevPhysicalPosition = ball.physicalPosition;
