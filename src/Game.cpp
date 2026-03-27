@@ -7,6 +7,7 @@
 #include "Vec2Extensions.h"
 #include <iostream>
 #include "Colliders.h"
+#include "Wall.h"
 
 // #define DEBUG
 
@@ -63,13 +64,18 @@ Game::Game()
     circleColliders.push_back(&flipperR->circleRot);
     circleColliders.push_back(&flipperR->circleTip);
 
-    // TEMPORARY, WILL CREATE WALL CLASS
-    float lineDist = 200.0f;
-    Color lineColor = GRAY;
-    LineCollider* lineLeftBottom = new LineCollider({gameWidth / 2.0f - lineDist, 0.8f * lineDist},
-                                    {flipperL->rotPos.x, flipperL->rotPos.y + 0.6f * flipperL->rotRadius});
-    lineColliders.push_back(lineLeftBottom);
+    // // TEMPORARY, WILL CREATE WALL CLASS
+    float wallDist = 200.0f;
+    Color wallColor = MAGENTA;
+    Vector2 wallPos1 = {gameWidth / 2.0f - wallDist, 0.8f * wallDist};
+    Vector2 wallPos2 = {flipperL->rotPos.x, flipperL->rotPos.y + 0.6f * flipperL->rotRadius};
+    // LineCollider* lineLeftBottom = new LineCollider({gameWidth / 2.0f - wallDist, 0.8f * wallDist},
+    //                                 {flipperL->rotPos.x, flipperL->rotPos.y + 0.6f * flipperL->rotRadius});
+    // lineColliders.push_back(lineLeftBottom);
     
+    Wall* wall = new Wall(wallPos1, wallPos2, 0.0f, 0.0f, false, wallColor);
+    lineColliders.push_back(&wall->lineCollider);
+    walls.push_back(wall);
 }
 
 Game::~Game()
@@ -78,7 +84,8 @@ Game::~Game()
         delete ball;
     for (Flipper* flipper : flippers)
         delete flipper;
-    // Delete walls
+    for (Wall* wall : walls)
+        delete wall;
     UnloadRenderTexture(renderTexture);
     UnloadShader(shader);
     audioManager.Unload();
@@ -211,14 +218,12 @@ void Game::Draw()
             DrawRectangle(-borderLen, (int)gameHeight, (int)gameWidth + borderLen, borderLen, borderColor); // Bottom
 
             // TEMPORARY, WILL CREATE WALL CLASS
-            for (LineCollider* line : lineColliders)
-                line->Draw();
+            // for (LineCollider* line : lineColliders)
+            //     line->Draw();
 
-            // for (Ball* ball : balls)
-            //     ball->Draw();
-
-            // for (Flipper* flipper : flippers)
-            //     flipper->Draw();
+            for (Wall* wall : walls)
+                wall->Draw();
+            
         EndMode2D();
 
         // Show fps

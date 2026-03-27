@@ -6,7 +6,7 @@
 #include <vector>
 #include "Colliders.h"
 #include "Flipper.h"
-
+#include "Wall.h"
 
 
 
@@ -35,6 +35,7 @@ private:
     std::vector<Ball*> balls; // movable
     std::vector<LineCollider*> lineColliders; // stationary (or attached to flippers)
     std::vector<CircleCollider*> circleColliders; // stationary (or attached to flippers)
+    std::vector<Wall*> walls;
     std::vector<Flipper*> flippers;
     double time;
     const float targetFPS = 200;

@@ -17,6 +17,10 @@ LineCollider::LineCollider(Vector2 pos1, Vector2 pos2) : line(pos1, pos2)
 {
 }
 
+LineCollider::LineCollider(Line l) : line(l)
+{
+}
+
 void LineCollider::Draw() // Should only be used for debugging
 {
     Vector2 offset = visualThickness * line.normal;

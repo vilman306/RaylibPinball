@@ -20,6 +20,7 @@ struct CircleCollider
 struct LineCollider
 {
     LineCollider(Vector2 pos1, Vector2 pos2);
+    LineCollider(Line l);
     void UpdatePosition(Vector2 p1, Vector2 p2);
     Line line;
     void* owner = nullptr;
