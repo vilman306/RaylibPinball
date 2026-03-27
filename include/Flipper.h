@@ -24,8 +24,8 @@ struct Flipper
     bool rotateUp = false;
     int rotDir = 1; // 1: up, -1: down
     const float angularSpeed = 20.0f; // rad per sec
-    const float minAngle = -PI / 6.0f;
-    const float maxAngle = PI / 4.0f;
+    const float minAngle = -PI / 5.0f;
+    const float maxAngle = PI / 6.0f;
     float physicalAngle = minAngle;
     float prevPhysicalAngle = minAngle;
     float visualAngle = minAngle;

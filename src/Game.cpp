@@ -20,7 +20,7 @@ Game::Game()
     
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(screenWidth, screenHeight, Config::windowTitle);
-    MaximizeWindow();
+    // MaximizeWindow();
     
     InitAudioDevice();
 
@@ -51,22 +51,32 @@ Game::Game()
     balls.push_back(ball2);
     
     float flipperLen = 80.0f;
-    float flipperSepDistX = 0.0f;
-    Flipper* flipperL = new Flipper({gameWidth / 2.0f - (flipperLen + flipperSepDistX), 300.0f}, // Store on heap so that adding to "flippers" won't change memory location of "flipperL"
-    flipperLen, VIOLET, 1);
+    float flipperSepDistX = 20.0f;
+    float flipperHeight = 80.0f;
+
+    Flipper* flipperL = new Flipper({gameWidth / 2.0f - (flipperLen + flipperSepDistX), flipperHeight}, // Store on heap so that adding to "flippers" won't change memory location of "flipperL"
+                                    flipperLen, VIOLET, 1);
     flippers.push_back(flipperL);
     lines.push_back(&flipperL->lineUp);
     lines.push_back(&flipperL->lineDown);
     circles.push_back(&flipperL->circleRot);
     circles.push_back(&flipperL->circleTip);
     
-    Flipper* flipperR = new Flipper({gameWidth / 2.0f + (flipperLen + flipperSepDistX), 300.0f},
-    flipperLen, VIOLET, -1);
+    Flipper* flipperR = new Flipper({gameWidth / 2.0f + (flipperLen + flipperSepDistX), flipperHeight},
+                                    flipperLen, VIOLET, -1);
     flippers.push_back(flipperR);
     lines.push_back(&flipperR->lineUp);
     lines.push_back(&flipperR->lineDown);
     circles.push_back(&flipperR->circleRot);
     circles.push_back(&flipperR->circleTip);
+
+    // TEMPORARY, WILL CREATE WALL CLASS
+    float lineDist = 200.0f;
+    Color lineColor = GRAY;
+    Line* lineLeftBottom = new Line({gameWidth / 2.0f - lineDist, 0.8f * lineDist},
+                                    {flipperL->rotPos.x, flipperL->rotPos.y + 0.6f * flipperL->rotRadius},
+                                    lineColor);
+    lines.push_back(lineLeftBottom);
     
     // Circle circle({gameWidth / 2.0f, 10.0f}, 40.0f, BLACK);
     // circles.push_back(circle);
@@ -74,8 +84,11 @@ Game::Game()
 
 Game::~Game()
 {
+    for (Ball* ball : balls)
+        delete ball;
     for (Flipper* flipper : flippers)
         delete flipper;
+    // Delete walls
     UnloadRenderTexture(renderTexture);
     UnloadShader(shader);
     audioManager.Unload();
@@ -192,7 +205,7 @@ void Game::Draw()
     float gameHeight = Config::gameHeight;
 
     BeginTextureMode(renderTexture);
-        ClearBackground(GRAY);
+        ClearBackground(BLACK);
 
         int textureWidth = renderTexture.texture.width;
         int textureHeight = renderTexture.texture.height;
@@ -205,6 +218,10 @@ void Game::Draw()
             DrawRectangle((int)gameWidth, -borderLen, borderLen, 2 * borderLen, BLACK); // Right
             DrawRectangle(-borderLen, -borderLen, (int)gameWidth + borderLen, borderLen, BLACK); // Up
             DrawRectangle(-borderLen, (int)gameHeight, (int)gameWidth + borderLen, borderLen, BLACK); // Bottom
+
+            // TEMPORARY, WILL CREATE WALL CLASS
+            for (Line* line : lines)
+                line->Draw();
 
             // for (Ball* ball : balls)
             //     ball->Draw();

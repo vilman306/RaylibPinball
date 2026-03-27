@@ -8,7 +8,7 @@ uniform sampler2D texture0;
 uniform vec2 resolution;
 
 const float samples = 5.0;
-const float quality = 1.0;
+const float quality = 3.0;
 
 void main()
 {
@@ -17,7 +17,7 @@ void main()
 
     vec4 source = texture(texture0, fragTexCoord);
 
-    const int range = 2; //(samples - 1) / 2;
+    const int range = int((samples - 1) / 2);
 
     for (int x = -range; x <= range; x++)
     {
@@ -26,8 +26,6 @@ void main()
             sum += texture(texture0, fragTexCoord + vec2(x, y) * sizeFactor);
         }
     }
-
-    // const int range = 
 
     finalColor = source + sum / (samples*samples);
 
