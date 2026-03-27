@@ -27,6 +27,9 @@ private:
     PhysicsManager physicsManager;
     AudioManager audioManager;
     RenderTexture renderTexture;
+    RenderTexture shaderRenderTexture;
+    Shader shader;
+    int shaderResLoc; // Location to shader's resolution uniform
     int screenWidth;
     int screenHeight;
     std::vector<Ball*> balls; // movable

@@ -13,7 +13,6 @@
 
 Game::Game()
 {
-    
     screenWidth = 1200;
     screenHeight = 800;
     float gameWidth = Config::gameWidth;
@@ -33,7 +32,13 @@ Game::Game()
     camera.rotation = 0.0f;
     
     renderTexture = LoadRenderTexture(screenWidth, screenHeight);
+    shaderRenderTexture = LoadRenderTexture(screenWidth, screenHeight);
     
+    shader = LoadShader(0, "../shaders/shader.fs");
+    shaderResLoc = GetShaderLocation(shader, "resolution");
+    // for (int i = 0; i < 1000; i++)
+        // std::cout << FileExists("../shaders/shader.fs") << std::endl;
+    // std::cout << "koakofdk" << std::endl;
     // Line* line = new Line({150.0f, 200.0f},
     //           {300.0f, 100.0f},
     //           VIOLET);
@@ -72,6 +77,7 @@ Game::~Game()
     for (Flipper* flipper : flippers)
         delete flipper;
     UnloadRenderTexture(renderTexture);
+    UnloadShader(shader);
     audioManager.Unload();
     CloseAudioDevice();
     CloseWindow();
@@ -171,6 +177,10 @@ void Game::GetScreenDimensions()
         screenHeight = newHeight;
         UnloadRenderTexture(renderTexture);
         renderTexture = LoadRenderTexture(screenWidth, screenHeight);
+        UnloadRenderTexture(shaderRenderTexture);
+        shaderRenderTexture = LoadRenderTexture(screenWidth, screenHeight);
+        float res[2] = { (float)screenWidth, (float)screenHeight };
+        SetShaderValue(shader, shaderResLoc, res, SHADER_UNIFORM_VEC2);
     }
 }
 
@@ -182,7 +192,6 @@ void Game::Draw()
     float gameHeight = Config::gameHeight;
 
     BeginTextureMode(renderTexture);
-
         ClearBackground(GRAY);
 
         int textureWidth = renderTexture.texture.width;
@@ -197,12 +206,11 @@ void Game::Draw()
             DrawRectangle(-borderLen, -borderLen, (int)gameWidth + borderLen, borderLen, BLACK); // Up
             DrawRectangle(-borderLen, (int)gameHeight, (int)gameWidth + borderLen, borderLen, BLACK); // Bottom
 
-            for (Ball* ball : balls)
-                ball->Draw();
+            // for (Ball* ball : balls)
+            //     ball->Draw();
 
-            for (Flipper* flipper : flippers)
-                flipper->Draw();
-
+            // for (Flipper* flipper : flippers)
+            //     flipper->Draw();
         EndMode2D();
 
         // Show fps
@@ -210,14 +218,24 @@ void Game::Draw()
         DrawText(fps.c_str(), 10, 10, 15, PURPLE);
         // Show time
         DrawText(std::to_string(time).c_str(), screenWidth - 80, 10, 15, PURPLE);
-
     EndTextureMode();
 
+    BeginTextureMode(shaderRenderTexture);
+        BeginMode2D(camera);
+            ClearBackground(BLANK);
+            for (Ball* ball : balls)
+                ball->Draw();
+
+            for (Flipper* flipper : flippers)
+                flipper->Draw();
+        EndMode2D();
+    EndTextureMode();
 
     BeginDrawing();
-
         DrawTexturePro(renderTexture.texture, {0, 0, (float)renderTexture.texture.width, -(float)renderTexture.texture.height}, {0, 0, (float)screenWidth, (float)screenHeight}, {0, 0}, 0.0f, WHITE);
-
+        
+        BeginShaderMode(shader);
+            DrawTexturePro(shaderRenderTexture.texture, {0, 0, (float)shaderRenderTexture.texture.width, -(float)shaderRenderTexture.texture.height}, {0, 0, (float)screenWidth, (float)screenHeight}, {0, 0}, 0.0f, WHITE);
+        EndShaderMode();
     EndDrawing();
 }
-
