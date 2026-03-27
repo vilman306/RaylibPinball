@@ -33,9 +33,9 @@ private:
     int screenWidth;
     int screenHeight;
     std::vector<Ball*> balls; // movable
-    std::vector<Line*> lines; // stationary (or attached to flippers)
-    std::vector<Circle*> circles; // stationary (or attached to flippers)
+    std::vector<LineCollider*> lines; // stationary (or attached to flippers)
+    std::vector<CircleCollider*> circles; // stationary (or attached to flippers)
     std::vector<Flipper*> flippers;
     double time;
-    const float targetFPS = 400;
+    const float targetFPS = 200;
 };

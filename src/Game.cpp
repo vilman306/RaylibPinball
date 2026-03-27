@@ -36,13 +36,6 @@ Game::Game()
     
     shader = LoadShader(0, "../shaders/shader.fs");
     shaderResLoc = GetShaderLocation(shader, "resolution");
-    // for (int i = 0; i < 1000; i++)
-        // std::cout << FileExists("../shaders/shader.fs") << std::endl;
-    // std::cout << "koakofdk" << std::endl;
-    // Line* line = new Line({150.0f, 200.0f},
-    //           {300.0f, 100.0f},
-    //           VIOLET);
-    // lines.push_back(line);
     
     Ball* ball = new Ball({gameWidth / 2.0f - 480.0f, 350.0f}, 10.0f, {0.0f, 0.0f}, BLUE);
     balls.push_back(ball);
@@ -73,13 +66,11 @@ Game::Game()
     // TEMPORARY, WILL CREATE WALL CLASS
     float lineDist = 200.0f;
     Color lineColor = GRAY;
-    Line* lineLeftBottom = new Line({gameWidth / 2.0f - lineDist, 0.8f * lineDist},
+    LineCollider* lineLeftBottom = new LineCollider({gameWidth / 2.0f - lineDist, 0.8f * lineDist},
                                     {flipperL->rotPos.x, flipperL->rotPos.y + 0.6f * flipperL->rotRadius});
     lineLeftBottom->color = lineColor;
     lines.push_back(lineLeftBottom);
     
-    // Circle circle({gameWidth / 2.0f, 10.0f}, 40.0f, BLACK);
-    // circles.push_back(circle);
 }
 
 Game::~Game()
@@ -221,7 +212,7 @@ void Game::Draw()
             DrawRectangle(-borderLen, (int)gameHeight, (int)gameWidth + borderLen, borderLen, borderColor); // Bottom
 
             // TEMPORARY, WILL CREATE WALL CLASS
-            for (Line* line : lines)
+            for (LineCollider* line : lines)
                 line->Draw();
 
             // for (Ball* ball : balls)

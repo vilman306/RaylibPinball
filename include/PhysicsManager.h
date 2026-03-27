@@ -18,7 +18,7 @@ public:
     
     const float ballFlipperTuning = 0.5f;
 
-    std::vector<PhysicsEvents> Update(std::vector<Ball*> &balls, std::vector<Line*> &lines, std::vector<Circle*> &circles);
+    std::vector<PhysicsEvents> Update(std::vector<Ball*> &balls, std::vector<LineCollider*> &lines, std::vector<CircleCollider*> &circles);
 
 private:
     int stepCount = 0; // Number of physics steps performed

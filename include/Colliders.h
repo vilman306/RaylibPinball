@@ -3,9 +3,9 @@
 #include "Vec2Extensions.h"
 #include "raymath.h"
 
-struct Circle
+struct CircleCollider
 {
-    Circle(Vector2 pos, float rad);
+    CircleCollider(Vector2 pos, float rad);
     Vector2 position;
     float radius;
     void* owner = nullptr;
@@ -17,9 +17,9 @@ struct Circle
     Color color = BLACK;
 };
 
-struct Line
+struct LineCollider
 {
-    Line(Vector2 pos1, Vector2 pos2);
+    LineCollider(Vector2 pos1, Vector2 pos2);
     void UpdatePosition(Vector2 p1, Vector2 p2);
     Vector2 pos1;
     Vector2 pos2;

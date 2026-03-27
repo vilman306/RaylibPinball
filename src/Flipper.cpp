@@ -20,33 +20,33 @@ Flipper::Flipper(Vector2 rotP, float len, Color c, int dir)
     // Vector2 normal = {-direction * lineDir.y, direction * lineDir.x};
     // if (direction == 1)
     // { // set line points in specific order so line gets wanted normal
-    //     lineUp = Line(rotPos + normal * rotRadius, tipPos + normal * tipRadius, c);
-    //     lineDown = Line(tipPos - normal * tipRadius, rotPos - normal * rotRadius, c);
+    //     lineUp = LineCollider(rotPos + normal * rotRadius, tipPos + normal * tipRadius, c);
+    //     lineDown = LineCollider(tipPos - normal * tipRadius, rotPos - normal * rotRadius, c);
     // }
     // else
     // {
-    //     lineUp = Line(tipPos + normal * tipRadius, rotPos + normal * rotRadius, c);
-    //     lineDown = Line(rotPos - normal * rotRadius, tipPos - normal * tipRadius, c);
+    //     lineUp = LineCollider(tipPos + normal * tipRadius, rotPos + normal * rotRadius, c);
+    //     lineDown = LineCollider(rotPos - normal * rotRadius, tipPos - normal * tipRadius, c);
     // }
 
     circleRot.owner = this;
     circleTip.owner = this;
-    circleRot.role = Circle::CircleRole::FlipperRot;
-    circleTip.role = Circle::CircleRole::FlipperTip;
+    circleRot.role = CircleCollider::CircleRole::FlipperRot;
+    circleTip.role = CircleCollider::CircleRole::FlipperTip;
     lineUp.owner = this;
     lineDown.owner = this;
-    lineUp.role = Line::LineRole::FlipperUp;
-    lineDown.role = Line::LineRole::FlipperDown;
+    lineUp.role = LineCollider::LineRole::FlipperUp;
+    lineDown.role = LineCollider::LineRole::FlipperDown;
 }
 
-void Flipper::UpdateCircleTipPosition(Circle &circle, float angle)
+void Flipper::UpdateCircleTipPosition(CircleCollider &circle, float angle)
 {
     Vector2 lineDir = {direction * cosf(angle), sinf(angle)};
     tipPos = rotPos + lineDir * length;
     circle.position = tipPos;
 }
 
-void Flipper::UpdateLineUpPosition(Line &line, float angle)
+void Flipper::UpdateLineUpPosition(LineCollider &line, float angle)
 {
     Vector2 lineDir = {direction * cosf(angle), sinf(angle)};
     Vector2 normal = {-direction * lineDir.y, direction * lineDir.x};
@@ -60,7 +60,7 @@ void Flipper::UpdateLineUpPosition(Line &line, float angle)
     }
 }
 
-void Flipper::UpdateLineDownPosition(Line &line, float angle)
+void Flipper::UpdateLineDownPosition(LineCollider &line, float angle)
 {
     Vector2 lineDir = {direction * cosf(angle), sinf(angle)};
     Vector2 normal = {-direction * lineDir.y, direction * lineDir.x};
@@ -78,12 +78,12 @@ void Flipper::Draw()
 {
     DrawCircleV(Utils::WorldToScreen(circleRot.position), circleRot.radius, color);
 
-    Circle visualCircleTip({0.0f, 0.0f}, tipRadius);
+    CircleCollider visualCircleTip({0.0f, 0.0f}, tipRadius);
     UpdateCircleTipPosition(visualCircleTip, visualAngle);
     DrawCircleV(Utils::WorldToScreen(visualCircleTip.position), tipRadius, color);
 
-    Line visualLineUp({0.0f, 0.0f}, {0.0f, 0.0f});
-    Line visualLineDown({0.0f, 0.0f}, {0.0f, 0.0f});
+    LineCollider visualLineUp({0.0f, 0.0f}, {0.0f, 0.0f});
+    LineCollider visualLineDown({0.0f, 0.0f}, {0.0f, 0.0f});
     UpdateLineUpPosition(visualLineUp, visualAngle);
     UpdateLineDownPosition(visualLineDown, visualAngle);
     Vector2 p1 = Utils::WorldToScreen(visualLineUp.pos1);

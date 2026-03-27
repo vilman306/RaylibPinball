@@ -6,19 +6,19 @@ struct Flipper
 {
     Flipper(Vector2 rotP, float len, Color c, int dir);
     void UpdatePhysics(float dtPhysics);
-    void UpdateCircleTipPosition(Circle& circle, float angle);
-    void UpdateLineUpPosition(Line& line, float angle);
-    void UpdateLineDownPosition(Line& line, float angle);
+    void UpdateCircleTipPosition(CircleCollider& circle, float angle);
+    void UpdateLineUpPosition(LineCollider& line, float angle);
+    void UpdateLineDownPosition(LineCollider& line, float angle);
     void Draw();
     Vector2 rotPos; // rotation point
     float length;
     Vector2 tipPos;
     const float rotRadius = 10.0f;
     const float tipRadius = 8.0f;
-    Circle circleRot; // used in physics
-    Circle circleTip; // used in physics
-    Line lineUp; // used in physics
-    Line lineDown; // used in physics
+    CircleCollider circleRot; // used in physics
+    CircleCollider circleTip; // used in physics
+    LineCollider lineUp; // used in physics
+    LineCollider lineDown; // used in physics
     Color color;
 
     bool rotateUp = false;
