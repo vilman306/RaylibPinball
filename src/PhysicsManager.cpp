@@ -19,7 +19,7 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
 
         Vector2 ballAcc = {0, -GRAVITY};          // Virtual ball acceleration
         Vector2 ballVel = ball->velocity;         // Virtual ball velocity
-        Vector2 ballPos = ball->physicalPosition; // Virtual ball position
+        Vector2 ballPos = ball->circle.position; // Virtual ball position
         float ballRad = ball->circle.radius;
 
 
@@ -156,7 +156,7 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
         for (int j = i + 1; j < balls.size(); j++)
         {
             Ball* ballB = balls[j];
-            Vector2& ballBPos = ballB->physicalPosition;
+            Vector2& ballBPos = ballB->circle.position;
             Vector2& ballBVel = ballB->velocity;
             float ballBRad = ballB->circle.radius;
 
@@ -190,8 +190,8 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
         // }
 
         // Assign the ball's new position and velocity
-        ball->prevPhysicalPosition = ball->physicalPosition;
-        ball->physicalPosition = ballPos;
+        ball->prevPhysicalPosition = ball->circle.position;
+        ball->circle.position = ballPos;
         ball->velocity = ballVel;
 
         eventsPerBall.push_back(events);

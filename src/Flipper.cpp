@@ -7,10 +7,10 @@ Flipper::Flipper(Vector2 rotP, float len, Color c, int dir)
       length(len),
       color(c),
       direction(dir),
-      circleRot(rotP, rotRadius, c),
-      circleTip({0.0f, 0.0f}, tipRadius, c),
-      lineUp({0.0f, 0.0f}, {0.0f, 0.0f}, c),
-      lineDown({0.0f, 0.0f}, {0.0f, 0.0f}, c)
+      circleRot(rotP, rotRadius),
+      circleTip({0.0f, 0.0f}, tipRadius),
+      lineUp({0.0f, 0.0f}, {0.0f, 0.0f}),
+      lineDown({0.0f, 0.0f}, {0.0f, 0.0f})
 {
 
     UpdateCircleTipPosition(circleTip, physicalAngle);
@@ -76,14 +76,14 @@ void Flipper::UpdateLineDownPosition(Line &line, float angle)
 
 void Flipper::Draw()
 {
-    circleRot.Draw();
+    DrawCircleV(Utils::WorldToScreen(circleRot.position), circleRot.radius, color);
 
-    Circle visualCircleTip({0.0f, 0.0f}, tipRadius, color);
+    Circle visualCircleTip({0.0f, 0.0f}, tipRadius);
     UpdateCircleTipPosition(visualCircleTip, visualAngle);
-    visualCircleTip.Draw();
+    DrawCircleV(Utils::WorldToScreen(visualCircleTip.position), tipRadius, color);
 
-    Line visualLineUp({0.0f, 0.0f}, {0.0f, 0.0f}, color);
-    Line visualLineDown({0.0f, 0.0f}, {0.0f, 0.0f}, color);
+    Line visualLineUp({0.0f, 0.0f}, {0.0f, 0.0f});
+    Line visualLineDown({0.0f, 0.0f}, {0.0f, 0.0f});
     UpdateLineUpPosition(visualLineUp, visualAngle);
     UpdateLineDownPosition(visualLineDown, visualAngle);
     Vector2 p1 = Utils::WorldToScreen(visualLineUp.pos1);

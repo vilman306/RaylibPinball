@@ -1,6 +1,6 @@
 #pragma once
 #include "raylib.h"
-#include "Geometry.h"
+#include "Colliders.h"
 
 struct Ball
 {
@@ -9,7 +9,10 @@ public:
     void Draw();
 
     Vector2 velocity;
-    Circle circle; // Contains the ball's visual position (in world coordinates!), which is lerped between prevPhysicalPosition and physicalPosition.
+    Circle circle; // Collider
+    
+    Color color;
+    Vector2 visualPosition;
     Vector2 physicalPosition; // Target position that "circle.position" is lerping to. This is the ball's physical position.
     Vector2 prevPhysicalPosition; // Previous position that "circle.position" was lerping to
 };

@@ -6,7 +6,7 @@
 #include "Config.h"
 #include "Vec2Extensions.h"
 #include <iostream>
-#include "Geometry.h"
+#include "Colliders.h"
 
 // #define DEBUG
 
@@ -51,7 +51,7 @@ Game::Game()
     balls.push_back(ball2);
     
     float flipperLen = 80.0f;
-    float flipperSepDistX = 20.0f;
+    float flipperSepDistX = 25.0f;
     float flipperHeight = 80.0f;
 
     Flipper* flipperL = new Flipper({gameWidth / 2.0f - (flipperLen + flipperSepDistX), flipperHeight}, // Store on heap so that adding to "flippers" won't change memory location of "flipperL"
@@ -74,8 +74,8 @@ Game::Game()
     float lineDist = 200.0f;
     Color lineColor = GRAY;
     Line* lineLeftBottom = new Line({gameWidth / 2.0f - lineDist, 0.8f * lineDist},
-                                    {flipperL->rotPos.x, flipperL->rotPos.y + 0.6f * flipperL->rotRadius},
-                                    lineColor);
+                                    {flipperL->rotPos.x, flipperL->rotPos.y + 0.6f * flipperL->rotRadius});
+    lineLeftBottom->color = lineColor;
     lines.push_back(lineLeftBottom);
     
     // Circle circle({gameWidth / 2.0f, 10.0f}, 40.0f, BLACK);
@@ -116,7 +116,7 @@ void Game::Update()
     if (IsKeyPressed(KEY_S))
         balls[0]->velocity.y -= 200.0f;
     if (IsKeyPressed(KEY_SPACE)) {
-        balls[0]->physicalPosition = {Config::gameWidth / 2.0f - 120.0f, 420.0f};
+        balls[0]->circle.position = {Config::gameWidth / 2.0f - 120.0f, 420.0f};
         balls[0]->velocity = {100.0f, 0.0f};
     }
 
@@ -168,7 +168,7 @@ void Game::Update()
     float lerpFactor = dtSum / dtPhysics;
     for (Ball* ball : balls)
     {
-        ball->circle.position = Vector2Lerp(ball->prevPhysicalPosition, ball->physicalPosition, lerpFactor);
+        ball->visualPosition = Vector2Lerp(ball->prevPhysicalPosition, ball->circle.position, lerpFactor);
     }
     // Lerp flipper angle
     for (Flipper* flipper : flippers)
@@ -214,10 +214,11 @@ void Game::Draw()
         BeginMode2D(camera);
             // Borders
             int borderLen = 5000;
-            DrawRectangle(-borderLen, -borderLen, borderLen, 2 * borderLen, BLACK); // Left
-            DrawRectangle((int)gameWidth, -borderLen, borderLen, 2 * borderLen, BLACK); // Right
-            DrawRectangle(-borderLen, -borderLen, (int)gameWidth + borderLen, borderLen, BLACK); // Up
-            DrawRectangle(-borderLen, (int)gameHeight, (int)gameWidth + borderLen, borderLen, BLACK); // Bottom
+            Color borderColor = DARKGRAY;
+            DrawRectangle(-borderLen, -borderLen, borderLen, 2 * borderLen, borderColor); // Left
+            DrawRectangle((int)gameWidth, -borderLen, borderLen, 2 * borderLen, borderColor);    // Right
+            DrawRectangle(-borderLen, -borderLen, (int)gameWidth + borderLen, borderLen, borderColor); // Up
+            DrawRectangle(-borderLen, (int)gameHeight, (int)gameWidth + borderLen, borderLen, borderColor); // Bottom
 
             // TEMPORARY, WILL CREATE WALL CLASS
             for (Line* line : lines)
