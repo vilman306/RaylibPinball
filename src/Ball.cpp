@@ -5,17 +5,16 @@
 #include "Utils.h"
 
 Ball::Ball(Vector2 pos, float rad, Vector2 vel, Color c)
-    : circle(pos, rad), velocity(vel)
+    : circleCollider(pos, rad), velocity(vel)
 {
-    velocity = {0.0f, 0.0f};
-    visualPosition = circle.position;
-    prevPhysicalPosition = circle.position;
+    visualPosition = circleCollider.circle.position;
+    prevPhysicalPosition = circleCollider.circle.position;
     color = c;
 }
 
 void Ball::Draw()
 {
     Vector2 screenPos = Utils::WorldToScreen(visualPosition);
-    DrawCircleV(screenPos, circle.radius, color);
+    DrawCircleV(screenPos, circleCollider.circle.radius, color);
 }
 

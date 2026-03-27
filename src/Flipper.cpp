@@ -31,19 +31,19 @@ Flipper::Flipper(Vector2 rotP, float len, Color c, int dir)
 
     circleRot.owner = this;
     circleTip.owner = this;
-    circleRot.role = CircleCollider::CircleRole::FlipperRot;
-    circleTip.role = CircleCollider::CircleRole::FlipperTip;
+    circleRot.role = CircleCollider::CircleColliderRole::FlipperRot;
+    circleTip.role = CircleCollider::CircleColliderRole::FlipperTip;
     lineUp.owner = this;
     lineDown.owner = this;
-    lineUp.role = LineCollider::LineRole::FlipperUp;
-    lineDown.role = LineCollider::LineRole::FlipperDown;
+    lineUp.role = LineCollider::LineColliderRole::FlipperUp;
+    lineDown.role = LineCollider::LineColliderRole::FlipperDown;
 }
 
-void Flipper::UpdateCircleTipPosition(CircleCollider &circle, float angle)
+void Flipper::UpdateCircleTipPosition(CircleCollider &circleCollider, float angle)
 {
     Vector2 lineDir = {direction * cosf(angle), sinf(angle)};
     tipPos = rotPos + lineDir * length;
-    circle.position = tipPos;
+    circleCollider.circle.position = tipPos;
 }
 
 void Flipper::UpdateLineUpPosition(LineCollider &line, float angle)
@@ -76,22 +76,22 @@ void Flipper::UpdateLineDownPosition(LineCollider &line, float angle)
 
 void Flipper::Draw()
 {
-    DrawCircleV(Utils::WorldToScreen(circleRot.position), circleRot.radius, color);
+    DrawCircleV(Utils::WorldToScreen(circleRot.circle.position), rotRadius, color);
 
     CircleCollider visualCircleTip({0.0f, 0.0f}, tipRadius);
     UpdateCircleTipPosition(visualCircleTip, visualAngle);
-    DrawCircleV(Utils::WorldToScreen(visualCircleTip.position), tipRadius, color);
+    DrawCircleV(Utils::WorldToScreen(visualCircleTip.circle.position), tipRadius, color);
 
     LineCollider visualLineUp({0.0f, 0.0f}, {0.0f, 0.0f});
     LineCollider visualLineDown({0.0f, 0.0f}, {0.0f, 0.0f});
     UpdateLineUpPosition(visualLineUp, visualAngle);
     UpdateLineDownPosition(visualLineDown, visualAngle);
-    Vector2 p1 = Utils::WorldToScreen(visualLineUp.pos1);
-    Vector2 p2 = Utils::WorldToScreen(visualLineDown.pos2);
-    Vector2 p3 = Utils::WorldToScreen(visualLineDown.pos1);
-    Vector2 p4 = Utils::WorldToScreen(visualLineUp.pos2);
+    Vector2 p1 = Utils::WorldToScreen(visualLineUp.line.pos1);
+    Vector2 p2 = Utils::WorldToScreen(visualLineDown.line.pos2);
+    Vector2 p3 = Utils::WorldToScreen(visualLineDown.line.pos1);
+    Vector2 p4 = Utils::WorldToScreen(visualLineUp.line.pos2);
     Vector2 points[4] = {p1, p2, p3, p4};
-    DrawTriangleFan(points, 4, color);
+    // DrawTriangleFan(points, 4, color);
 
     // float padding = 200.0f;
     // Vector2 leftUp = Utils::WorldToScreen({padding, Config::gameHeight - padding});

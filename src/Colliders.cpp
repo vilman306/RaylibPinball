@@ -3,37 +3,32 @@
 #include "Utils.h"
 #include <iostream>
 
-CircleCollider::CircleCollider(Vector2 pos, float rad) : position(pos), radius(rad)
+CircleCollider::CircleCollider(Vector2 position, float radius) : circle(position, radius)
 {
 }
 
 void CircleCollider::Draw() // Should only be used for debugging
 {
-    Vector2 screenPos = Utils::WorldToScreen(position);
-    DrawCircleV(screenPos, radius, color);
+    Vector2 screenPos = Utils::WorldToScreen(circle.position);
+    DrawCircleV(screenPos, circle.radius, color);
 }
 
-LineCollider::LineCollider(Vector2 p1, Vector2 p2) : pos1(p1), pos2(p2)
+LineCollider::LineCollider(Vector2 pos1, Vector2 pos2) : line(pos1, pos2)
 {
-    Vector2 dir = Vector2Normalize(pos2 - pos1);
-    normal = {-dir.y, dir.x};
 }
 
 void LineCollider::Draw() // Should only be used for debugging
 {
-    Vector2 offset = visualThickness * normal;
-    Vector2 p1 = Utils::WorldToScreen(pos1 + offset);
-    Vector2 p2 = Utils::WorldToScreen(pos1 - offset);
-    Vector2 p3 = Utils::WorldToScreen(pos2 - offset);
-    Vector2 p4 = Utils::WorldToScreen(pos2 + offset);
+    Vector2 offset = visualThickness * line.normal;
+    Vector2 p1 = Utils::WorldToScreen(line.pos1 + offset);
+    Vector2 p2 = Utils::WorldToScreen(line.pos1 - offset);
+    Vector2 p3 = Utils::WorldToScreen(line.pos2 - offset);
+    Vector2 p4 = Utils::WorldToScreen(line.pos2 + offset);
     Vector2 points[4] = {p1, p2, p3, p4};
     DrawTriangleFan(points, 4, color);
 }
 
-void LineCollider::UpdatePosition(Vector2 p1, Vector2 p2)
+void LineCollider::UpdatePosition(Vector2 pos1, Vector2 pos2)
 {
-    pos1 = p1;
-    pos2 = p2;
-    Vector2 dir = Vector2Normalize(pos2 - pos1);
-    normal = {-dir.y, dir.x};
+    line = Line(pos1, pos2);
 }

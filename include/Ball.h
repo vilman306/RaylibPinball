@@ -9,7 +9,7 @@ public:
     void Draw();
 
     Vector2 velocity;
-    CircleCollider circle; // Collider
+    CircleCollider circleCollider; // Collider
     
     Color color;
     Vector2 visualPosition;

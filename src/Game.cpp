@@ -50,26 +50,25 @@ Game::Game()
     Flipper* flipperL = new Flipper({gameWidth / 2.0f - (flipperLen + flipperSepDistX), flipperHeight}, // Store on heap so that adding to "flippers" won't change memory location of "flipperL"
                                     flipperLen, VIOLET, 1);
     flippers.push_back(flipperL);
-    lines.push_back(&flipperL->lineUp);
-    lines.push_back(&flipperL->lineDown);
-    circles.push_back(&flipperL->circleRot);
-    circles.push_back(&flipperL->circleTip);
+    lineColliders.push_back(&flipperL->lineUp);
+    lineColliders.push_back(&flipperL->lineDown);
+    circleColliders.push_back(&flipperL->circleRot);
+    circleColliders.push_back(&flipperL->circleTip);
     
     Flipper* flipperR = new Flipper({gameWidth / 2.0f + (flipperLen + flipperSepDistX), flipperHeight},
                                     flipperLen, VIOLET, -1);
     flippers.push_back(flipperR);
-    lines.push_back(&flipperR->lineUp);
-    lines.push_back(&flipperR->lineDown);
-    circles.push_back(&flipperR->circleRot);
-    circles.push_back(&flipperR->circleTip);
+    lineColliders.push_back(&flipperR->lineUp);
+    lineColliders.push_back(&flipperR->lineDown);
+    circleColliders.push_back(&flipperR->circleRot);
+    circleColliders.push_back(&flipperR->circleTip);
 
     // TEMPORARY, WILL CREATE WALL CLASS
     float lineDist = 200.0f;
     Color lineColor = GRAY;
     LineCollider* lineLeftBottom = new LineCollider({gameWidth / 2.0f - lineDist, 0.8f * lineDist},
                                     {flipperL->rotPos.x, flipperL->rotPos.y + 0.6f * flipperL->rotRadius});
-    lineLeftBottom->color = lineColor;
-    lines.push_back(lineLeftBottom);
+    lineColliders.push_back(lineLeftBottom);
     
 }
 
@@ -107,7 +106,7 @@ void Game::Update()
     if (IsKeyPressed(KEY_S))
         balls[0]->velocity.y -= 200.0f;
     if (IsKeyPressed(KEY_SPACE)) {
-        balls[0]->circle.position = {Config::gameWidth / 2.0f - 120.0f, 420.0f};
+        balls[0]->circleCollider.circle.position = {Config::gameWidth / 2.0f - 120.0f, 420.0f};
         balls[0]->velocity = {100.0f, 0.0f};
     }
 
@@ -139,7 +138,7 @@ void Game::Update()
         for (Flipper *flipper : flippers) {
             flipper->UpdatePhysics(dtPhysics);
         }
-        physicsEventsPerBall = physicsManager.Update(balls, lines, circles);
+        physicsEventsPerBall = physicsManager.Update(balls, lineColliders, circleColliders);
         dtSum -= dtPhysics;
     }
 
@@ -159,7 +158,7 @@ void Game::Update()
     float lerpFactor = dtSum / dtPhysics;
     for (Ball* ball : balls)
     {
-        ball->visualPosition = Vector2Lerp(ball->prevPhysicalPosition, ball->circle.position, lerpFactor);
+        ball->visualPosition = Vector2Lerp(ball->prevPhysicalPosition, ball->circleCollider.circle.position, lerpFactor);
     }
     // Lerp flipper angle
     for (Flipper* flipper : flippers)
@@ -212,7 +211,7 @@ void Game::Draw()
             DrawRectangle(-borderLen, (int)gameHeight, (int)gameWidth + borderLen, borderLen, borderColor); // Bottom
 
             // TEMPORARY, WILL CREATE WALL CLASS
-            for (LineCollider* line : lines)
+            for (LineCollider* line : lineColliders)
                 line->Draw();
 
             // for (Ball* ball : balls)
@@ -243,8 +242,8 @@ void Game::Draw()
     BeginDrawing();
         DrawTexturePro(renderTexture.texture, {0, 0, (float)renderTexture.texture.width, -(float)renderTexture.texture.height}, {0, 0, (float)screenWidth, (float)screenHeight}, {0, 0}, 0.0f, WHITE);
         
-        BeginShaderMode(shader);
+        // BeginShaderMode(shader);
             DrawTexturePro(shaderRenderTexture.texture, {0, 0, (float)shaderRenderTexture.texture.width, -(float)shaderRenderTexture.texture.height}, {0, 0, (float)screenWidth, (float)screenHeight}, {0, 0}, 0.0f, WHITE);
-        EndShaderMode();
+        // EndShaderMode();
     EndDrawing();
 }

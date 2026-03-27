@@ -7,7 +7,7 @@
 #include "Flipper.h"
 #include <iostream>
 
-std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std::vector<LineCollider*>& lines, std::vector<CircleCollider*>& circles)
+std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std::vector<LineCollider*>& lineColliders, std::vector<CircleCollider*>& circleColliders)
 {
     std::vector<PhysicsEvents> eventsPerBall;
 
@@ -19,8 +19,8 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
 
         Vector2 ballAcc = {0, -GRAVITY};          // Virtual ball acceleration
         Vector2 ballVel = ball->velocity;         // Virtual ball velocity
-        Vector2 ballPos = ball->circle.position; // Virtual ball position
-        float ballRad = ball->circle.radius;
+        Vector2 ballPos = ball->circleCollider.circle.position; // Virtual ball position
+        float ballRad = ball->circleCollider.circle.radius;
 
 
         ballVel += ballAcc * dt;
@@ -57,10 +57,10 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
         }
 
         // Ball - circle collision
-        for (CircleCollider* circle : circles)
+        for (CircleCollider* circleCollider : circleColliders)
         {
-            Vector2 circlePos = circle->position;
-            float circleRad = circle->radius;
+            Vector2 circlePos = circleCollider->circle.position;
+            float circleRad = circleCollider->circle.radius;
             Vector2 posDiff = ballPos - circlePos;
             float posDiffLen = Vector2Length(posDiff);
             if (posDiffLen < ballRad + circleRad)
@@ -76,10 +76,10 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
                     ballVel -= 2.0f * velN;
                 }
 
-                if (circle->role != CircleCollider::CircleRole::FlipperTip)
+                if (circleCollider->role != CircleCollider::CircleColliderRole::FlipperTip)
                     continue;
 
-                Flipper* flipper = static_cast<Flipper*>(circle->owner); // Warning! Will cause problems if line can have owners of different type than Flipper
+                Flipper* flipper = static_cast<Flipper*>(circleCollider->owner); // Warning! Will cause problems if line can have owners of different type than Flipper
                 if (!(flipper->physicalAngle < flipper->maxAngle && flipper->physicalAngle > flipper->minAngle))
                     continue;
 
@@ -106,17 +106,19 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
         }
 
         // Ball - line collision
-        for (LineCollider* line : lines)
+        for (LineCollider* lineCollider : lineColliders)
         {
-            Vector2 v1 = ballPos - line->pos1;
-            Vector2 v2 = line->pos2 - line->pos1;
+            Vector2 lineP1 = lineCollider->line.pos1;
+            Vector2 lineP2 = lineCollider->line.pos2;
+            Vector2 v1 = ballPos - lineP1;
+            Vector2 v2 = lineP2 - lineP1;
             float t = Clamp(Vector2DotProduct(v1, v2) / Vector2LengthSqr(v2), 0.0f, 1.0f);
-            Vector2 p = line->pos1 + t * v2; // Ball's "clamped" projection on line
+            Vector2 p = lineP1 + t * v2; // Ball's "clamped" projection on line
             float d = Vector2Length(ballPos - p);
             if (d < ballRad)
             {
                 events.ballBounce = true;
-                Vector2 normal = line->normal;
+                Vector2 normal = lineCollider->line.normal;
                 ballPos = p + normal * ballRad;
                 float signedSpeedN = Vector2DotProduct(ballVel, normal);
                 if (signedSpeedN < 0.0f) { // To prevent bugs if flipper moves into ball while ball is traveling from flipper
@@ -124,10 +126,10 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
                     ballVel -= 2.0f * velN;
                 }
                 
-                if (line->owner == nullptr)
+                if (lineCollider->owner == nullptr)
                     continue;
 
-                Flipper* flipper = static_cast<Flipper*>(line->owner); // Warning! Will cause problems if line can have owners of different type than Flipper
+                Flipper* flipper = static_cast<Flipper*>(lineCollider->owner); // Warning! Will cause problems if line can have owners of different type than Flipper
                 if (!(flipper->physicalAngle < flipper->maxAngle && flipper->physicalAngle > flipper->minAngle))
                     continue;
 
@@ -135,7 +137,7 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
                 float rLen = Vector2Length(r);
                 
                 int flipperSide = 1;
-                if (line->role == LineCollider::LineRole::FlipperDown)
+                if (lineCollider->role == LineCollider::LineColliderRole::FlipperDown)
                     flipperSide *= -1;
 
                 int flipperDir = flipper->direction;
@@ -156,9 +158,9 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
         for (int j = i + 1; j < balls.size(); j++)
         {
             Ball* ballB = balls[j];
-            Vector2& ballBPos = ballB->circle.position;
+            Vector2& ballBPos = ballB->circleCollider.circle.position;
             Vector2& ballBVel = ballB->velocity;
-            float ballBRad = ballB->circle.radius;
+            float ballBRad = ballB->circleCollider.circle.radius;
 
             Vector2 posDiff = ballPos - ballBPos;
             float posDiffLen = Vector2Length(posDiff);
@@ -190,8 +192,8 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
         // }
 
         // Assign the ball's new position and velocity
-        ball->prevPhysicalPosition = ball->circle.position;
-        ball->circle.position = ballPos;
+        ball->prevPhysicalPosition = ball->circleCollider.circle.position;
+        ball->circleCollider.circle.position = ballPos;
         ball->velocity = ballVel;
 
         eventsPerBall.push_back(events);
