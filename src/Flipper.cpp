@@ -91,7 +91,7 @@ void Flipper::Draw()
     Vector2 p3 = Utils::WorldToScreen(visualLineDown.line.pos1);
     Vector2 p4 = Utils::WorldToScreen(visualLineUp.line.pos2);
     Vector2 points[4] = {p1, p2, p3, p4};
-    // DrawTriangleFan(points, 4, color);
+    DrawTriangleFan(points, 4, color);
 
     // float padding = 200.0f;
     // Vector2 leftUp = Utils::WorldToScreen({padding, Config::gameHeight - padding});

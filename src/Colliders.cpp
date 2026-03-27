@@ -20,10 +20,10 @@ LineCollider::LineCollider(Vector2 pos1, Vector2 pos2) : line(pos1, pos2)
 void LineCollider::Draw() // Should only be used for debugging
 {
     Vector2 offset = visualThickness * line.normal;
-    Vector2 p1 = Utils::WorldToScreen(line.pos1 + offset);
+    Vector2 p1 = Utils::WorldToScreen(line.pos1);
     Vector2 p2 = Utils::WorldToScreen(line.pos1 - offset);
     Vector2 p3 = Utils::WorldToScreen(line.pos2 - offset);
-    Vector2 p4 = Utils::WorldToScreen(line.pos2 + offset);
+    Vector2 p4 = Utils::WorldToScreen(line.pos2);
     Vector2 points[4] = {p1, p2, p3, p4};
     DrawTriangleFan(points, 4, color);
 }
