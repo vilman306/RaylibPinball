@@ -9,7 +9,7 @@
 #include "Colliders.h"
 #include "Wall.h"
 
-// #define DEBUG
+#define DEBUG
 
 
 Game::Game()
@@ -65,13 +65,12 @@ Game::Game()
     circleColliders.push_back(&flipperR->circleTip);
 
     // // TEMPORARY, WILL CREATE WALL CLASS
-    float wallDist = 200.0f;
+    float wallDist = 500.0f;
     Color wallColor = MAGENTA;
-    Vector2 wallPos1 = {gameWidth / 2.0f - wallDist, 0.8f * wallDist};
-    Vector2 wallPos2 = {flipperL->rotPos.x, flipperL->rotPos.y + 0.6f * flipperL->rotRadius};
-    // LineCollider* lineLeftBottom = new LineCollider({gameWidth / 2.0f - wallDist, 0.8f * wallDist},
-    //                                 {flipperL->rotPos.x, flipperL->rotPos.y + 0.6f * flipperL->rotRadius});
-    // lineColliders.push_back(lineLeftBottom);
+    // Vector2 wallPos1 = {gameWidth / 2.0f - wallDist, 0.8f * wallDist};
+    // Vector2 wallPos2 = {flipperL->rotPos.x, flipperL->rotPos.y + 0.6f * flipperL->rotRadius};
+    Vector2 wallPos1 = {50.0f, 500.0f};
+    Vector2 wallPos2 = {100.0f, 100.0f};
     
     Wall* wall = new Wall(wallPos1, wallPos2, 0.0f, 0.0f, false, wallColor);
     lineColliders.push_back(&wall->lineCollider);
@@ -208,6 +207,8 @@ void Game::Draw()
         int textureHeight = renderTexture.texture.height;
         camera.offset = {textureWidth / 2.0f, textureHeight / 2.0f};
         camera.zoom = std::min(textureWidth / gameWidth, textureHeight / gameHeight);
+
+          
         BeginMode2D(camera);
             // Borders
             int borderLen = 5000;
@@ -218,8 +219,8 @@ void Game::Draw()
             DrawRectangle(-borderLen, (int)gameHeight, (int)gameWidth + borderLen, borderLen, borderColor); // Bottom
 
             // TEMPORARY, WILL CREATE WALL CLASS
-            // for (LineCollider* line : lineColliders)
-            //     line->Draw();
+            for (LineCollider* line : lineColliders)
+                line->Draw();
 
             for (Wall* wall : walls)
                 wall->Draw();
@@ -252,3 +253,6 @@ void Game::Draw()
         // EndShaderMode();
     EndDrawing();
 }
+
+
+// World to screen shouldnt be used in e.g. flippers, because a camera is used.

@@ -10,7 +10,7 @@ struct Wall
     std::optional<CircleCollider> circle1Collider; // circle collider at line.pos1
     std::optional<CircleCollider> circle2Collider; // circle collider at line.pos2
     std::optional<LineCollider> backLineCollider;
-    float defaultThickness = 4.0f;
+    float defaultThickness = 20.0f;
 
     Color color;
     void Draw();
