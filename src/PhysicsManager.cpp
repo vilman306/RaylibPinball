@@ -7,7 +7,7 @@
 #include "Flipper.h"
 #include <iostream>
 
-std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*> &balls, std::vector<Line*> &lines, std::vector<Circle*> &circles)
+std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std::vector<Line*>& lines, std::vector<Circle*>& circles)
 {
     std::vector<PhysicsEvents> eventsPerBall;
 
@@ -15,7 +15,7 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*> &balls, std
     {
         PhysicsEvents events;
 
-        Ball *ball = balls[i];
+        Ball* ball = balls[i];
 
         Vector2 ballAcc = {0, -GRAVITY};          // Virtual ball acceleration
         Vector2 ballVel = ball->velocity;         // Virtual ball velocity
@@ -57,7 +57,7 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*> &balls, std
         }
 
         // Ball - circle collision
-        for (Circle *circle : circles)
+        for (Circle* circle : circles)
         {
             Vector2 circlePos = circle->position;
             float circleRad = circle->radius;
@@ -79,7 +79,7 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*> &balls, std
                 if (circle->role != Circle::CircleRole::FlipperTip)
                     continue;
 
-                Flipper *flipper = static_cast<Flipper*>(circle->owner); // Warning! Will cause problems if line can have owners of different type than Flipper
+                Flipper* flipper = static_cast<Flipper*>(circle->owner); // Warning! Will cause problems if line can have owners of different type than Flipper
                 if (!(flipper->physicalAngle < flipper->maxAngle && flipper->physicalAngle > flipper->minAngle))
                     continue;
 
@@ -106,7 +106,7 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*> &balls, std
         }
 
         // Ball - line collision
-        for (Line *line : lines)
+        for (Line* line : lines)
         {
             Vector2 v1 = ballPos - line->pos1;
             Vector2 v2 = line->pos2 - line->pos1;
@@ -127,7 +127,7 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*> &balls, std
                 if (line->owner == nullptr)
                     continue;
 
-                Flipper *flipper = static_cast<Flipper*>(line->owner); // Warning! Will cause problems if line can have owners of different type than Flipper
+                Flipper* flipper = static_cast<Flipper*>(line->owner); // Warning! Will cause problems if line can have owners of different type than Flipper
                 if (!(flipper->physicalAngle < flipper->maxAngle && flipper->physicalAngle > flipper->minAngle))
                     continue;
 
@@ -155,9 +155,9 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*> &balls, std
         // Ball - ball collision
         for (int j = i + 1; j < balls.size(); j++)
         {
-            Ball *ballB = balls[j];
-            Vector2 &ballBPos = ballB->physicalPosition;
-            Vector2 &ballBVel = ballB->velocity;
+            Ball* ballB = balls[j];
+            Vector2& ballBPos = ballB->physicalPosition;
+            Vector2& ballBVel = ballB->velocity;
             float ballBRad = ballB->circle.radius;
 
             Vector2 posDiff = ballPos - ballBPos;

@@ -34,20 +34,20 @@ Game::Game()
     
     renderTexture = LoadRenderTexture(screenWidth, screenHeight);
     
-    // Line *line = new Line({150.0f, 200.0f},
+    // Line* line = new Line({150.0f, 200.0f},
     //           {300.0f, 100.0f},
     //           VIOLET);
     // lines.push_back(line);
     
-    Ball *ball = new Ball({gameWidth / 2.0f - 480.0f, 350.0f}, 10.0f, {0.0f, 0.0f}, BLUE);
+    Ball* ball = new Ball({gameWidth / 2.0f - 480.0f, 350.0f}, 10.0f, {0.0f, 0.0f}, BLUE);
     balls.push_back(ball);
     
-    Ball *ball2 = new Ball({gameWidth / 2.0f, 300.0f}, 15.0f, {0.0f, 0.0f}, RED);
+    Ball* ball2 = new Ball({gameWidth / 2.0f, 300.0f}, 15.0f, {0.0f, 0.0f}, RED);
     balls.push_back(ball2);
     
     float flipperLen = 80.0f;
     float flipperSepDistX = 0.0f;
-    Flipper *flipperL = new Flipper({gameWidth / 2.0f - (flipperLen + flipperSepDistX), 300.0f}, // Store on heap so that adding to "flippers" won't change memory location of "flipperL"
+    Flipper* flipperL = new Flipper({gameWidth / 2.0f - (flipperLen + flipperSepDistX), 300.0f}, // Store on heap so that adding to "flippers" won't change memory location of "flipperL"
     flipperLen, VIOLET, 1);
     flippers.push_back(flipperL);
     lines.push_back(&flipperL->lineUp);
@@ -55,7 +55,7 @@ Game::Game()
     circles.push_back(&flipperL->circleRot);
     circles.push_back(&flipperL->circleTip);
     
-    Flipper *flipperR = new Flipper({gameWidth / 2.0f + (flipperLen + flipperSepDistX), 300.0f},
+    Flipper* flipperR = new Flipper({gameWidth / 2.0f + (flipperLen + flipperSepDistX), 300.0f},
     flipperLen, VIOLET, -1);
     flippers.push_back(flipperR);
     lines.push_back(&flipperR->lineUp);
@@ -69,7 +69,7 @@ Game::Game()
 
 Game::~Game()
 {
-    for (Flipper *flipper : flippers)
+    for (Flipper* flipper : flippers)
         delete flipper;
     UnloadRenderTexture(renderTexture);
     audioManager.Unload();
@@ -103,7 +103,7 @@ void Game::Update()
 
     bool leftDown = IsKeyDown(KEY_LEFT);
     bool rightDown = IsKeyDown(KEY_RIGHT);
-    for (Flipper *flipper : flippers)
+    for (Flipper* flipper : flippers)
     {
         if (flipper->direction == 1)
             flipper->rotateUp = leftDown;
@@ -147,12 +147,12 @@ void Game::Update()
 
     // Lerp ball positions between its previous and current physical positions:
     float lerpFactor = dtSum / dtPhysics;
-    for (Ball *ball : balls)
+    for (Ball* ball : balls)
     {
         ball->circle.position = Vector2Lerp(ball->prevPhysicalPosition, ball->physicalPosition, lerpFactor);
     }
     // Lerp flipper angle
-    for (Flipper *flipper : flippers)
+    for (Flipper* flipper : flippers)
     {
         flipper->visualAngle = Lerp(flipper->prevPhysicalAngle, flipper->physicalAngle, lerpFactor);
     }
@@ -197,10 +197,10 @@ void Game::Draw()
             DrawRectangle(-borderLen, -borderLen, (int)gameWidth + borderLen, borderLen, BLACK); // Up
             DrawRectangle(-borderLen, (int)gameHeight, (int)gameWidth + borderLen, borderLen, BLACK); // Bottom
 
-            for (Ball *ball : balls)
+            for (Ball* ball : balls)
                 ball->Draw();
 
-            for (Flipper *flipper : flippers)
+            for (Flipper* flipper : flippers)
                 flipper->Draw();
 
         EndMode2D();

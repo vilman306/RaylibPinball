@@ -10,7 +10,7 @@ struct Circle
     Color color = BLACK;
     Vector2 position;
     float radius;
-    void *owner = nullptr;
+    void* owner = nullptr;
     enum class CircleRole { Generic, FlipperRot, FlipperTip };
     CircleRole role = CircleRole::Generic;
 };
@@ -25,7 +25,7 @@ struct Line
     Vector2 normal; // normal.y > 0 if pos1.x < pos2.x
     float visualThickness = 2.0f;
     void Draw(); // Should only be used for testing!
-    void *owner = nullptr;
+    void* owner = nullptr;
     enum class LineRole { Generic, FlipperUp, FlipperDown };
     LineRole role = LineRole::Generic;
 };

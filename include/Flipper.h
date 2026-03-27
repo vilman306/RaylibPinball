@@ -6,9 +6,9 @@ struct Flipper
 {
     Flipper(Vector2 rotP, float len, Color c, int dir);
     void UpdatePhysics(float dtPhysics);
-    void UpdateCircleTipPosition(Circle &circle, float angle);
-    void UpdateLineUpPosition(Line &line, float angle);
-    void UpdateLineDownPosition(Line &line, float angle);
+    void UpdateCircleTipPosition(Circle& circle, float angle);
+    void UpdateLineUpPosition(Line& line, float angle);
+    void UpdateLineDownPosition(Line& line, float angle);
     void Draw();
     Vector2 rotPos; // rotation point
     float length;
