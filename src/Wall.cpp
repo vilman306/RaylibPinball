@@ -2,7 +2,7 @@
 #include "Colliders.h"
 #include "Utils.h"
 
-Wall::Wall(Vector2 pos1, Vector2 pos2, float circle1Rad, float circle2Rad, bool hasBackline, Color c) : lineCollider(pos1, pos2)
+Wall::Wall(Vector2 pos1, Vector2 pos2, float circle1Rad, float circle2Rad, bool hasBackline, Color c) : lineCollider(pos1, pos2), color(c)
 {
     Vector2 normal = lineCollider.line.normal;
     if (circle1Rad > 0.0f)
@@ -16,9 +16,9 @@ Wall::Wall(Vector2 pos1, Vector2 pos2, float circle1Rad, float circle2Rad, bool 
 void Wall::Draw()
 {
     if (circle1Collider)
-        DrawCircleV(circle1Collider->circle.position, circle1Collider->circle.radius, color);
+        DrawCircleV(Utils::WorldToScreen(circle1Collider->circle.position), circle1Collider->circle.radius, color);
     if (circle2Collider)
-        DrawCircleV(circle2Collider->circle.position, circle2Collider->circle.radius, color);
+        DrawCircleV(Utils::WorldToScreen(circle2Collider->circle.position), circle2Collider->circle.radius, color);
     
     Vector2 p1 = lineCollider.line.pos1;
     Vector2 p4 = lineCollider.line.pos2;
@@ -39,6 +39,6 @@ void Wall::Draw()
         else
             p3 = lineCollider.line.pos2 - lineCollider.line.normal * defaultThickness;
     }
-    Vector2 points[4] = {p1, p2, p3, p4};
+    Vector2 points[4] = {Utils::WorldToScreen(p1), Utils::WorldToScreen(p2), Utils::WorldToScreen(p3), Utils::WorldToScreen(p4)};
     DrawTriangleFan(points, 4, color);
 }

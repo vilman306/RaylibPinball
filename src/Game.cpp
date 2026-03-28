@@ -9,7 +9,7 @@
 #include "Colliders.h"
 #include "Wall.h"
 
-#define DEBUG
+// #define DEBUG
 
 
 Game::Game()
@@ -72,9 +72,15 @@ Game::Game()
     Vector2 wallPos1 = {50.0f, 500.0f};
     Vector2 wallPos2 = {100.0f, 100.0f};
     
-    Wall* wall = new Wall(wallPos1, wallPos2, 0.0f, 0.0f, false, wallColor);
-    lineColliders.push_back(&wall->lineCollider);
+    Wall* wall = new Wall(wallPos1, wallPos2, 20.0f, 25.0f, true, wallColor);
     walls.push_back(wall);
+    lineColliders.push_back(&wall->lineCollider);
+    if (wall->circle1Collider)
+        circleColliders.push_back(&*wall->circle1Collider);
+    if (wall->circle2Collider)
+        circleColliders.push_back(&*wall->circle2Collider);
+    if (wall->backLineCollider)
+        lineColliders.push_back(&*wall->backLineCollider);
 }
 
 Game::~Game()
@@ -218,9 +224,11 @@ void Game::Draw()
             DrawRectangle(-borderLen, -borderLen, (int)gameWidth + borderLen, borderLen, borderColor); // Up
             DrawRectangle(-borderLen, (int)gameHeight, (int)gameWidth + borderLen, borderLen, borderColor); // Bottom
 
-            // TEMPORARY, WILL CREATE WALL CLASS
-            for (LineCollider* line : lineColliders)
-                line->Draw();
+            // for (LineCollider* line : lineColliders)
+            //     line->Draw();
+
+            // for (CircleCollider* circle : circleColliders)
+            //     circle->Draw();
 
             for (Wall* wall : walls)
                 wall->Draw();
@@ -255,4 +263,3 @@ void Game::Draw()
 }
 
 
-// World to screen shouldnt be used in e.g. flippers, because a camera is used.
