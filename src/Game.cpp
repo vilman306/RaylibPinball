@@ -84,12 +84,19 @@ Game::Game()
     float x4 = w3->backLineCollider->line.pos1.x;
     Wall* w4 = AddWall({x4, w3->GetPos1().y}, {x4, 0.0f}, 0.0f, 0.0f, false, false, false, wallColor);
     float s5L = 30.0f;
-    float h5 = Config::gameHeight - 80.0f;
+    float h5 = gameHeight - 80.0f;
     float x5L = w2L->backLineCollider->line.pos2.x - s5L;
     float s5R = 40.0f;
     float x5R = w4->GetPos1().x + s5R;
     Wall* w5L = AddWall({x5L, h5}, {x5L, 0.0f}, 0.0f, 0.0f, false, false, false, wallColor);
-    Wall* w5R = AddWall({x5R, 0.0f}, {x5R, h5}, 0.0f, 0.0f, false, false, false, wallColor);    
+    Wall* w5R = AddWall({x5R, 0.0f}, {x5R, h5}, 0.0f, 0.0f, false, false, false, wallColor);
+    float d6 = 50.0f;
+    float h6 = gameHeight - 10.0f;
+    Wall* w6L = AddWall({w5L->GetPos1().x + d6, h6}, w5L->GetPos1(), 0.0f, 0.0f, false, false, false, wallColor);
+    Wall* w6R = AddWall(w5R->GetPos2(), {w5R->GetPos2().x - d6, h6}, 0.0f, 0.0f, false, false, false, wallColor);
+    Wall* w7 = AddWall(w6R->GetPos2(), w6L->GetPos1(), 0.0f, 0.0f, false, false, false, wallColor);
+    float h8 = 10.0f;
+    Wall* w8 = AddWall({x4, h8}, {x5R, h8}, 0.0f, 0.0f, false, false, false, wallColor);
 }
 
 Wall* Game::AddWall(Vector2 pos1, Vector2 pos2, float circle1Rad, float circle2Rad, bool positionCircle1InPos1, bool positionCircle2InPos2, bool hasBackline, Color c)

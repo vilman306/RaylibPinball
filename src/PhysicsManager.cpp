@@ -72,8 +72,10 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
                 float signedSpeedN = Vector2DotProduct(ballVel, normal);
                 if (signedSpeedN < 0.0f)
                 { // To prevent bugs if flipper moves into ball while ball is traveling from flipper
-                    Vector2 velN = normal * signedSpeedN * BOUNCE_DAMPING;
-                    ballVel -= 2.0f * velN;
+                    Vector2 velN = normal * signedSpeedN;
+                    Vector2 parallel = {-normal.y, normal.x};
+                    Vector2 velP = Vector2DotProduct(ballVel, parallel) * parallel;
+                    ballVel = velP - velN * BOUNCE_DAMPING;
                 }
 
                 if (circleCollider->role != CircleCollider::CircleColliderRole::FlipperTip)
@@ -120,8 +122,10 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
                 ballPos = p + normal * ballRad;
                 float signedSpeedN = Vector2DotProduct(ballVel, normal);
                 if (signedSpeedN < 0.0f) { // To prevent bugs if flipper moves into ball while ball is traveling from flipper
-                    Vector2 velN = normal * signedSpeedN * BOUNCE_DAMPING;
-                    ballVel -= 2.0f * velN;
+                    Vector2 velN = normal * signedSpeedN;
+                    Vector2 parallel = Vector2Normalize(v2);
+                    Vector2 velP = Vector2DotProduct(ballVel, parallel) * parallel;
+                    ballVel = velP - velN * BOUNCE_DAMPING;
                 }
                 
                 if (lineCollider->owner == nullptr)
