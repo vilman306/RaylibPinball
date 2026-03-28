@@ -20,6 +20,7 @@ struct Flipper
     LineCollider lineUp; // used in physics
     LineCollider lineDown; // used in physics
     Color color;
+    const float restitution = 0.3f;
 
     bool rotateUp = false;
     int rotDir = 1; // 1: up, -1: down

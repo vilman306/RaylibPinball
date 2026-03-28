@@ -185,14 +185,6 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
         }
 
 
-
-        // // Limit ball speed
-        // const float currentBallSpeed = Vector2Length(ballVel);
-        // if (currentBallSpeed >= MAX_BALL_SPEED)
-        // {
-        //     ballVel = Vector2Normalize(ballVel) * MAX_BALL_SPEED;
-        // }
-
         // Assign the ball's new position and velocity
         ball->prevPhysicalPosition = ball->circleCollider.circle.position;
         ball->circleCollider.circle.position = ballPos;
@@ -200,10 +192,6 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
 
         eventsPerBall.push_back(events);
     }
-    
-    
-
-    
 
     stepCount += 1;
     return eventsPerBall;

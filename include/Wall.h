@@ -14,6 +14,7 @@ struct Wall
     std::optional<CircleCollider> circle2Collider; // circle collider at line.pos2
     std::optional<LineCollider> backLineCollider;
     float defaultThickness = 10.0f;
+    const float restitution = 0.5f;
 
     Color color;
     void Draw();

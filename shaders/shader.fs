@@ -17,7 +17,7 @@ void main()
 
     vec4 source = texture(texture0, fragTexCoord);
 
-    const int range = 2 //int((samples - 1) / 2);
+    const int range = 2; //int((samples - 1) / 2);
 
     for (int x = -range; x <= range; x++)
     {

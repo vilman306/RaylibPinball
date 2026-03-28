@@ -38,95 +38,23 @@ Game::Game()
     shader = LoadShader(0, "../shaders/shader.fs");
     shaderResLoc = GetShaderLocation(shader, "resolution");
     
-    Ball* ball = new Ball({gameWidth / 2.0f, 350.0f}, 10.0f, {0.0f, 0.0f}, BLUE);
-    balls.push_back(ball);
     
-    // Ball* ball2 = new Ball({gameWidth / 2.0f, 300.0f}, 15.0f, {0.0f, 0.0f}, RED);
-    // balls.push_back(ball2);
-    
+    Ball* ball = AddBall({gameWidth / 2.0f, 350.0f}, 10.0f, {0.0f, 0.0f}, BLUE);
+
     float flipperLen = 80.0f;
     float flipperSepDistX = 25.0f;
     float flipperHeight = 80.0f;
 
-    Flipper* flipperL = new Flipper({gameWidth / 2.0f - (flipperLen + flipperSepDistX), flipperHeight}, // Store on heap so that adding to "flippers" won't change memory location of "flipperL"
+    Flipper* flipperL = AddFlipper({gameWidth / 2.0f - (flipperLen + flipperSepDistX), flipperHeight}, // Store on heap so that adding to "flippers" won't change memory location of "flipperL"
                                     flipperLen, VIOLET, 1);
-    flippers.push_back(flipperL);
-    lineColliders.push_back(&flipperL->lineUp);
-    lineColliders.push_back(&flipperL->lineDown);
-    circleColliders.push_back(&flipperL->circleRot);
-    circleColliders.push_back(&flipperL->circleTip);
     
-    Flipper* flipperR = new Flipper({gameWidth / 2.0f + (flipperLen + flipperSepDistX), flipperHeight},
+    Flipper* flipperR = AddFlipper({gameWidth / 2.0f + (flipperLen + flipperSepDistX), flipperHeight},
                                     flipperLen, VIOLET, -1);
-    flippers.push_back(flipperR);
-    lineColliders.push_back(&flipperR->lineUp);
-    lineColliders.push_back(&flipperR->lineDown);
-    circleColliders.push_back(&flipperR->circleRot);
-    circleColliders.push_back(&flipperR->circleTip);
-
-    Vector2 rotPosL = flipperL->circleRot.circle.position;
-    Vector2 rotPosR = flipperR->circleRot.circle.position;
-    Color wallColor = MAGENTA;
-    float d1 = 200.0f;
-    float h1 = 200.0f;
-    float rotRad = flipperL->rotRadius;
-    Wall* w1L = AddWall({rotPosL.x - d1, rotPosL.y + h1}, rotPosL, 0.0f, rotRad, false, true, false, wallColor); // Left
-    Wall* w1R = AddWall(rotPosR, {rotPosR.x + d1, rotPosR.y + h1}, rotRad, 0.0f, true, false, false, wallColor); // Right
-    float d2 = 100.0f;
-    float h2 = 200.0f;
-    float r2 = 5.0f;
-    Wall* w2L = AddWall({w1L->GetPos1().x - d2, w1L->GetPos1().y + h2}, w1L->GetPos1(), r2, 0.0f, false, false, true, wallColor);
-    Wall* w2R = AddWall(w1R->GetPos2(), {w1R->GetPos2().x + d2, w1R->GetPos2().y + h2}, 0.0f, 0.0f, false, false, false, wallColor);
-    float h3 = 400.0f;
-    float r3 = 5.0f;
-    Wall* w3 = AddWall(w2R->GetPos2(), {w2R->GetPos2().x, w2R->GetPos2().y + h3}, 0.0f, r3, false, false, true, wallColor);
-    float s4 = 40.0f;
-    float x4 = w3->backLineCollider->line.pos1.x;
-    Wall* w4 = AddWall({x4, w3->GetPos1().y}, {x4, 0.0f}, 0.0f, 0.0f, false, false, false, wallColor);
-    float s5L = 30.0f;
-    float h5 = gameHeight - 80.0f;
-    float x5L = w2L->backLineCollider->line.pos2.x - s5L;
-    float s5R = 40.0f;
-    float x5R = w4->GetPos1().x + s5R;
-    Wall* w5L = AddWall({x5L, h5}, {x5L, 0.0f}, 0.0f, 0.0f, false, false, false, wallColor);
-    Wall* w5R = AddWall({x5R, 0.0f}, {x5R, h5}, 0.0f, 0.0f, false, false, false, wallColor);
-    float d6 = 50.0f;
-    float h6 = gameHeight - 10.0f;
-    Wall* w6L = AddWall({w5L->GetPos1().x + d6, h6}, w5L->GetPos1(), 0.0f, 0.0f, false, false, false, wallColor);
-    Wall* w6R = AddWall(w5R->GetPos2(), {w5R->GetPos2().x - d6, h6}, 0.0f, 0.0f, false, false, false, wallColor);
-    Wall* w7 = AddWall(w6R->GetPos2(), w6L->GetPos1(), 0.0f, 0.0f, false, false, false, wallColor);
-    float h8 = 10.0f;
-    Wall* w8 = AddWall({x4, h8}, {x5R, h8}, 0.0f, 0.0f, false, false, false, wallColor);
+    
+    AddLevelWalls(flipperL, flipperR, MAGENTA);
 }
 
-Wall* Game::AddWall(Vector2 pos1, Vector2 pos2, float circle1Rad, float circle2Rad, bool positionCircle1InPos1, bool positionCircle2InPos2, bool hasBackline, Color c)
-{
-    Wall* wall = new Wall(pos1, pos2, circle1Rad, circle2Rad, positionCircle1InPos1, positionCircle2InPos2, hasBackline, c);
-    walls.push_back(wall);
-    lineColliders.push_back(&wall->lineCollider);
-    if (wall->circle1Collider)
-        circleColliders.push_back(&*wall->circle1Collider);
-    if (wall->circle2Collider)
-        circleColliders.push_back(&*wall->circle2Collider);
-    if (wall->backLineCollider)
-        lineColliders.push_back(&*wall->backLineCollider);
-    return wall;
-}
 
-Game::~Game()
-{
-    for (Ball* ball : balls)
-        delete ball;
-    for (Flipper* flipper : flippers)
-        delete flipper;
-    for (Wall* wall : walls)
-        delete wall;
-    UnloadRenderTexture(renderTexture);
-    UnloadShader(shader);
-    audioManager.Unload();
-    CloseAudioDevice();
-    CloseWindow();
-}
 
 void Game::Run()
 {
@@ -231,7 +159,7 @@ void Game::GetScreenDimensions()
 
 void Game::Draw()
 {
-    GetScreenDimensions(); // Updates rendertexture if window dimensions changed
+    GetScreenDimensions(); // Updates rendertextures if window dimensions changed
 
     float gameWidth = Config::gameWidth;
     float gameHeight = Config::gameHeight;
@@ -260,8 +188,8 @@ void Game::Draw()
             // for (CircleCollider* circle : circleColliders)
             //     circle->Draw();
 
-            for (Wall* wall : walls)
-                wall->Draw();
+            // for (Wall* wall : walls)
+            //     wall->Draw();
             
         EndMode2D();
 
@@ -280,16 +208,105 @@ void Game::Draw()
 
             for (Flipper* flipper : flippers)
                 flipper->Draw();
+            
+            for (Wall* wall : walls)
+                wall->Draw();
         EndMode2D();
     EndTextureMode();
 
     BeginDrawing();
         DrawTexturePro(renderTexture.texture, {0, 0, (float)renderTexture.texture.width, -(float)renderTexture.texture.height}, {0, 0, (float)screenWidth, (float)screenHeight}, {0, 0}, 0.0f, WHITE);
         
-        // BeginShaderMode(shader);
+        BeginShaderMode(shader);
             DrawTexturePro(shaderRenderTexture.texture, {0, 0, (float)shaderRenderTexture.texture.width, -(float)shaderRenderTexture.texture.height}, {0, 0, (float)screenWidth, (float)screenHeight}, {0, 0}, 0.0f, WHITE);
-        // EndShaderMode();
+           
+        EndShaderMode();
     EndDrawing();
 }
 
 
+
+
+void Game::AddLevelWalls(Flipper* flipperL, Flipper* flipperR, Color wallColor)
+{
+    float gameHeight = Config::gameHeight;
+    Vector2 rotPosL = flipperL->circleRot.circle.position;
+    Vector2 rotPosR = flipperR->circleRot.circle.position;
+    float d1 = 200.0f;
+    float h1 = 200.0f;
+    float rotRad = flipperL->rotRadius;
+    Wall* w1L = AddWall({rotPosL.x - d1, rotPosL.y + h1}, rotPosL, 0.0f, rotRad, false, true, false, wallColor); // Left
+    Wall* w1R = AddWall(rotPosR, {rotPosR.x + d1, rotPosR.y + h1}, rotRad, 0.0f, true, false, false, wallColor); // Right
+    float d2 = 100.0f;
+    float h2 = 200.0f;
+    float r2 = 5.0f;
+    Wall* w2L = AddWall({w1L->GetPos1().x - d2, w1L->GetPos1().y + h2}, w1L->GetPos1(), r2, 0.0f, false, false, true, wallColor);
+    Wall* w2R = AddWall(w1R->GetPos2(), {w1R->GetPos2().x + d2, w1R->GetPos2().y + h2}, 0.0f, 0.0f, false, false, false, wallColor);
+    float h3 = 400.0f;
+    float r3 = 5.0f;
+    Wall* w3 = AddWall(w2R->GetPos2(), {w2R->GetPos2().x, w2R->GetPos2().y + h3}, 0.0f, r3, false, false, true, wallColor);
+    float s4 = 40.0f;
+    float x4 = w3->backLineCollider->line.pos1.x;
+    Wall* w4 = AddWall({x4, w3->GetPos1().y}, {x4, 0.0f}, 0.0f, 0.0f, false, false, false, wallColor);
+    float s5L = 30.0f;
+    float h5 = gameHeight - 80.0f;
+    float x5L = w2L->backLineCollider->line.pos2.x - s5L;
+    float s5R = 40.0f;
+    float x5R = w4->GetPos1().x + s5R;
+    Wall* w5L = AddWall({x5L, h5}, {x5L, 0.0f}, 0.0f, 0.0f, false, false, false, wallColor);
+    Wall* w5R = AddWall({x5R, 0.0f}, {x5R, h5}, 0.0f, 0.0f, false, false, false, wallColor);
+    float d6 = 50.0f;
+    float h6 = gameHeight - 10.0f;
+    Wall* w6L = AddWall({w5L->GetPos1().x + d6, h6}, w5L->GetPos1(), 0.0f, 0.0f, false, false, false, wallColor);
+    Wall* w6R = AddWall(w5R->GetPos2(), {w5R->GetPos2().x - d6, h6}, 0.0f, 0.0f, false, false, false, wallColor);
+    Wall* w7 = AddWall(w6R->GetPos2(), w6L->GetPos1(), 0.0f, 0.0f, false, false, false, wallColor);
+    float h8 = 10.0f;
+    Wall* w8 = AddWall({x4, h8}, {x5R, h8}, 0.0f, 0.0f, false, false, false, wallColor);
+}
+
+Flipper* Game::AddFlipper(Vector2 rotP, float len, Color c, int dir)
+{
+    Flipper* flipper = new Flipper(rotP, len, c, dir);
+    flippers.push_back(flipper);
+    lineColliders.push_back(&flipper->lineUp);
+    lineColliders.push_back(&flipper->lineDown);
+    circleColliders.push_back(&flipper->circleRot);
+    circleColliders.push_back(&flipper->circleTip);
+    return flipper;
+}
+
+Ball* Game::AddBall(Vector2 pos, float rad, Vector2 vel, Color c)
+{
+    Ball* ball = new Ball(pos, rad, vel, c);
+    balls.push_back(ball);
+    return ball;
+}
+
+Wall* Game::AddWall(Vector2 pos1, Vector2 pos2, float circle1Rad, float circle2Rad, bool positionCircle1InPos1, bool positionCircle2InPos2, bool hasBackline, Color c)
+{
+    Wall* wall = new Wall(pos1, pos2, circle1Rad, circle2Rad, positionCircle1InPos1, positionCircle2InPos2, hasBackline, c);
+    walls.push_back(wall);
+    lineColliders.push_back(&wall->lineCollider);
+    if (wall->circle1Collider)
+        circleColliders.push_back(&*wall->circle1Collider);
+    if (wall->circle2Collider)
+        circleColliders.push_back(&*wall->circle2Collider);
+    if (wall->backLineCollider)
+        lineColliders.push_back(&*wall->backLineCollider);
+    return wall;
+}
+
+Game::~Game()
+{
+    for (Ball* ball : balls)
+        delete ball;
+    for (Flipper* flipper : flippers)
+        delete flipper;
+    for (Wall* wall : walls)
+        delete wall;
+    UnloadRenderTexture(renderTexture);
+    UnloadShader(shader);
+    audioManager.Unload();
+    CloseAudioDevice();
+    CloseWindow();
+}

@@ -22,6 +22,9 @@ private:
     void Update();
     void Draw();
     void GetScreenDimensions();
+    Ball* AddBall(Vector2 pos, float rad, Vector2 vel, Color c);
+    Flipper* AddFlipper(Vector2 rotP, float len, Color c, int dir);
+    void AddLevelWalls(Flipper* flipperL, Flipper* flipperR, Color wallColor);
     Wall* AddWall(Vector2 pos1, Vector2 pos2, float circle1Rad, float circle2Rad, bool positionCircle1InPos1, bool positionCircle2InPos2, bool hasBackline, Color c);
     // RenderTexture2D renderTexture; // Texture to draw on (which then is scaled to actual window size)
     Camera2D camera;
