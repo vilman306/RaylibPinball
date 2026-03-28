@@ -16,12 +16,13 @@ public:
     Game();
     ~Game();
     void Run();
+    // void DrawScaledRenderTexture();
+    
+private:
     void Update();
     void Draw();
     void GetScreenDimensions();
-    // void DrawScaledRenderTexture();
-
-private:
+    Wall* AddWall(Vector2 pos1, Vector2 pos2, float circle1Rad, float circle2Rad, bool positionCircle1InPos1, bool positionCircle2InPos2, bool hasBackline, Color c);
     // RenderTexture2D renderTexture; // Texture to draw on (which then is scaled to actual window size)
     Camera2D camera;
     PhysicsManager physicsManager;

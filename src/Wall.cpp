@@ -2,15 +2,40 @@
 #include "Colliders.h"
 #include "Utils.h"
 
-Wall::Wall(Vector2 pos1, Vector2 pos2, float circle1Rad, float circle2Rad, bool hasBackline, Color c) : lineCollider(pos1, pos2), color(c)
+Wall::Wall(Vector2 pos1, Vector2 pos2, float circle1Rad, float circle2Rad, bool positionCircle1InPos1, bool positionCircle2InPos2, bool hasBackline, Color c) : lineCollider(pos1, pos2), color(c)
 {
+    // If circle_i_Rad > 0, circle_i is placed in pos_i, otherwise lineCollider.line.pos_i = pos_i
     Vector2 normal = lineCollider.line.normal;
-    if (circle1Rad > 0.0f)
-        circle1Collider = CircleCollider(pos1 - circle1Rad * normal, circle1Rad);
-    if (circle2Rad > 0.0f)
-        circle2Collider = CircleCollider(pos2 - circle2Rad * normal, circle2Rad);
-    if (hasBackline)
-        backLineCollider = LineCollider(pos2 - 2*circle2Rad*normal, pos1 - 2*circle1Rad*normal);
+
+    float t1 = defaultThickness, t2 = defaultThickness;
+
+    if (circle1Rad > 0.0f) {
+        if (positionCircle1InPos1) {
+            circle1Collider = CircleCollider(pos1, circle1Rad);
+            lineCollider.UpdatePosition(pos1 + normal * circle1Rad, lineCollider.line.pos2);
+        }
+        else
+            circle1Collider = CircleCollider(pos1 - normal * circle1Rad, circle1Rad);
+        t2 = circle1Rad;
+        t1 = circle1Rad;
+    }
+    if (circle2Rad > 0.0f) {
+        if (positionCircle2InPos2) {
+            circle2Collider = CircleCollider(pos2, circle2Rad);
+            lineCollider.UpdatePosition(lineCollider.line.pos1, pos2 + normal * circle2Rad);
+        }
+        else
+            circle2Collider = CircleCollider(pos2 - normal * circle2Rad, circle2Rad);
+        t1 = circle2Rad;
+        if (t2 == defaultThickness)
+            t2 = circle2Rad;
+    }
+    normal = lineCollider.line.normal;
+    pos1 = lineCollider.line.pos1;
+    pos2 = lineCollider.line.pos2;
+    if (hasBackline) {
+        backLineCollider = LineCollider(pos2 - 2 * t1 * normal, pos1 - 2 * t2 * normal);
+    }
 }
 
 void Wall::Draw()

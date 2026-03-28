@@ -38,11 +38,11 @@ Game::Game()
     shader = LoadShader(0, "../shaders/shader.fs");
     shaderResLoc = GetShaderLocation(shader, "resolution");
     
-    Ball* ball = new Ball({gameWidth / 2.0f - 480.0f, 350.0f}, 10.0f, {0.0f, 0.0f}, BLUE);
+    Ball* ball = new Ball({gameWidth / 2.0f, 350.0f}, 10.0f, {0.0f, 0.0f}, BLUE);
     balls.push_back(ball);
     
-    Ball* ball2 = new Ball({gameWidth / 2.0f, 300.0f}, 15.0f, {0.0f, 0.0f}, RED);
-    balls.push_back(ball2);
+    // Ball* ball2 = new Ball({gameWidth / 2.0f, 300.0f}, 15.0f, {0.0f, 0.0f}, RED);
+    // balls.push_back(ball2);
     
     float flipperLen = 80.0f;
     float flipperSepDistX = 25.0f;
@@ -64,15 +64,37 @@ Game::Game()
     circleColliders.push_back(&flipperR->circleRot);
     circleColliders.push_back(&flipperR->circleTip);
 
-    // // TEMPORARY, WILL CREATE WALL CLASS
-    float wallDist = 500.0f;
+    Vector2 rotPosL = flipperL->circleRot.circle.position;
+    Vector2 rotPosR = flipperR->circleRot.circle.position;
     Color wallColor = MAGENTA;
-    // Vector2 wallPos1 = {gameWidth / 2.0f - wallDist, 0.8f * wallDist};
-    // Vector2 wallPos2 = {flipperL->rotPos.x, flipperL->rotPos.y + 0.6f * flipperL->rotRadius};
-    Vector2 wallPos1 = {50.0f, 500.0f};
-    Vector2 wallPos2 = {100.0f, 100.0f};
-    
-    Wall* wall = new Wall(wallPos1, wallPos2, 20.0f, 25.0f, true, wallColor);
+    float d1 = 200.0f;
+    float h1 = 200.0f;
+    float rotRad = flipperL->rotRadius;
+    Wall* w1L = AddWall({rotPosL.x - d1, rotPosL.y + h1}, rotPosL, 0.0f, rotRad, false, true, false, wallColor); // Left
+    Wall* w1R = AddWall(rotPosR, {rotPosR.x + d1, rotPosR.y + h1}, rotRad, 0.0f, true, false, false, wallColor); // Right
+    float d2 = 100.0f;
+    float h2 = 200.0f;
+    float r2 = 5.0f;
+    Wall* w2L = AddWall({w1L->GetPos1().x - d2, w1L->GetPos1().y + h2}, w1L->GetPos1(), r2, 0.0f, false, false, true, wallColor);
+    Wall* w2R = AddWall(w1R->GetPos2(), {w1R->GetPos2().x + d2, w1R->GetPos2().y + h2}, 0.0f, 0.0f, false, false, false, wallColor);
+    float h3 = 400.0f;
+    float r3 = 5.0f;
+    Wall* w3 = AddWall(w2R->GetPos2(), {w2R->GetPos2().x, w2R->GetPos2().y + h3}, 0.0f, r3, false, false, true, wallColor);
+    float s4 = 40.0f;
+    float x4 = w3->backLineCollider->line.pos1.x;
+    Wall* w4 = AddWall({x4, w3->GetPos1().y}, {x4, 0.0f}, 0.0f, 0.0f, false, false, false, wallColor);
+    float s5L = 30.0f;
+    float h5 = Config::gameHeight - 80.0f;
+    float x5L = w2L->backLineCollider->line.pos2.x - s5L;
+    float s5R = 40.0f;
+    float x5R = w4->GetPos1().x + s5R;
+    Wall* w5L = AddWall({x5L, h5}, {x5L, 0.0f}, 0.0f, 0.0f, false, false, false, wallColor);
+    Wall* w5R = AddWall({x5R, 0.0f}, {x5R, h5}, 0.0f, 0.0f, false, false, false, wallColor);    
+}
+
+Wall* Game::AddWall(Vector2 pos1, Vector2 pos2, float circle1Rad, float circle2Rad, bool positionCircle1InPos1, bool positionCircle2InPos2, bool hasBackline, Color c)
+{
+    Wall* wall = new Wall(pos1, pos2, circle1Rad, circle2Rad, positionCircle1InPos1, positionCircle2InPos2, hasBackline, c);
     walls.push_back(wall);
     lineColliders.push_back(&wall->lineCollider);
     if (wall->circle1Collider)
@@ -81,6 +103,7 @@ Game::Game()
         circleColliders.push_back(&*wall->circle2Collider);
     if (wall->backLineCollider)
         lineColliders.push_back(&*wall->backLineCollider);
+    return wall;
 }
 
 Game::~Game()
