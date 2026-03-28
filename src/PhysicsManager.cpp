@@ -83,8 +83,6 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
                 if (!(flipper->physicalAngle < flipper->maxAngle && flipper->physicalAngle > flipper->minAngle))
                     continue;
 
-                // Implement flipper "bounce"
-
                 Vector2 p = circlePos + normal * circleRad;
                 Vector2 r = p - flipper->rotPos;
                 float rLen = Vector2Length(r);
