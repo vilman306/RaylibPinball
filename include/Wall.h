@@ -3,7 +3,7 @@
 #include "Colliders.h"
 #include <optional>
 
-struct Wall
+struct Wall : ColliderOwner
 {
     Wall(Vector2 pos1, Vector2 pos2, float circle1Rad, float circle2Rad, bool positionCircle1InPos1, bool positionCircle2InPos2, bool hasBackline, Color c);
         // positionCircle1InPos1 : true => circle1Collider is placed in pos1, lineCollider.pos1 is positioned with respect to that
@@ -14,10 +14,11 @@ struct Wall
     std::optional<CircleCollider> circle2Collider; // circle collider at line.pos2
     std::optional<LineCollider> backLineCollider;
     float defaultThickness = 10.0f;
-    const float restitution = 0.5f;
-
+    
     Color color;
     void Draw();
     Vector2 GetPos1() { return lineCollider.line.pos1; };
     Vector2 GetPos2() { return lineCollider.line.pos2; };
+private:
+    const float restitution = 0.4f;
 };

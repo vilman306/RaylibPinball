@@ -7,11 +7,12 @@ Flipper::Flipper(Vector2 rotP, float len, Color c, int dir)
       length(len),
       color(c),
       direction(dir),
-      circleRot(rotP, rotRadius),
-      circleTip({0.0f, 0.0f}, tipRadius),
-      lineUp({0.0f, 0.0f}, {0.0f, 0.0f}),
-      lineDown({0.0f, 0.0f}, {0.0f, 0.0f})
+      circleRot(rotP, rotRadius, this),
+      circleTip({0.0f, 0.0f}, tipRadius, this),
+      lineUp({0.0f, 0.0f}, {0.0f, 0.0f}, this),
+      lineDown({0.0f, 0.0f}, {0.0f, 0.0f}, this)
 {
+    material.restitution = restitution;
 
     UpdateCircleTipPosition(circleTip, physicalAngle);
     UpdateLineUpPosition(lineUp, physicalAngle);
@@ -76,14 +77,16 @@ void Flipper::UpdateLineDownPosition(LineCollider &line, float angle)
 
 void Flipper::Draw()
 {
+
+    // USE CIRCLES INSTEAD OF COLLIDERS
     DrawCircleV(Utils::WorldToScreen(circleRot.circle.position), rotRadius, color);
 
-    CircleCollider visualCircleTip({0.0f, 0.0f}, tipRadius);
+    CircleCollider visualCircleTip({0.0f, 0.0f}, tipRadius, this);
     UpdateCircleTipPosition(visualCircleTip, visualAngle);
     DrawCircleV(Utils::WorldToScreen(visualCircleTip.circle.position), tipRadius, color);
 
-    LineCollider visualLineUp({0.0f, 0.0f}, {0.0f, 0.0f});
-    LineCollider visualLineDown({0.0f, 0.0f}, {0.0f, 0.0f});
+    LineCollider visualLineUp({0.0f, 0.0f}, {0.0f, 0.0f}, this);
+    LineCollider visualLineDown({0.0f, 0.0f}, {0.0f, 0.0f}, this);
     UpdateLineUpPosition(visualLineUp, visualAngle);
     UpdateLineDownPosition(visualLineDown, visualAngle);
     Vector2 p1 = Utils::WorldToScreen(visualLineUp.line.pos1);

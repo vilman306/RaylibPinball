@@ -2,22 +2,22 @@
 #include "Colliders.h"
 #include "Utils.h"
 
-Wall::Wall(Vector2 pos1, Vector2 pos2, float circle1Rad, float circle2Rad, bool positionCircle1InPos1, bool positionCircle2InPos2, bool hasBackline, Color c) : lineCollider(pos1, pos2), color(c)
+Wall::Wall(Vector2 pos1, Vector2 pos2, float circle1Rad, float circle2Rad, bool positionCircle1InPos1, bool positionCircle2InPos2, bool hasBackline, Color c) : lineCollider(pos1, pos2, this), color(c)
 {
-    lineCollider.owner = this;
-    // If circle_i_Rad > 0, circle_i is placed in pos_i, otherwise lineCollider.line.pos_i = pos_i
+    material.restitution = restitution;
+
     Vector2 normal = lineCollider.line.normal;
 
     float t1 = defaultThickness, t2 = defaultThickness;
 
     if (circle1Rad > 0.0f) {
         if (positionCircle1InPos1) {
-            circle1Collider = CircleCollider(pos1, circle1Rad);
+            circle1Collider = CircleCollider(pos1, circle1Rad, this);
             circle1Collider->owner = this;
             lineCollider.UpdatePosition(pos1 + normal * circle1Rad, lineCollider.line.pos2);
         }
         else {
-            circle1Collider = CircleCollider(pos1 - normal * circle1Rad, circle1Rad);
+            circle1Collider = CircleCollider(pos1 - normal * circle1Rad, circle1Rad, this);
             circle1Collider->owner = this;
         }
         t2 = circle1Rad;
@@ -25,12 +25,12 @@ Wall::Wall(Vector2 pos1, Vector2 pos2, float circle1Rad, float circle2Rad, bool 
     }
     if (circle2Rad > 0.0f) {
         if (positionCircle2InPos2) {
-            circle2Collider = CircleCollider(pos2, circle2Rad);
+            circle2Collider = CircleCollider(pos2, circle2Rad, this);
             circle2Collider->owner = this;
             lineCollider.UpdatePosition(lineCollider.line.pos1, pos2 + normal * circle2Rad);
         }
         else {
-            circle2Collider = CircleCollider(pos2 - normal * circle2Rad, circle2Rad);
+            circle2Collider = CircleCollider(pos2 - normal * circle2Rad, circle2Rad, this);
             circle2Collider->owner = this;
         }
         t1 = circle2Rad;
@@ -41,7 +41,7 @@ Wall::Wall(Vector2 pos1, Vector2 pos2, float circle1Rad, float circle2Rad, bool 
     pos1 = lineCollider.line.pos1;
     pos2 = lineCollider.line.pos2;
     if (hasBackline) {
-        backLineCollider = LineCollider(pos2 - 2 * t1 * normal, pos1 - 2 * t2 * normal);
+        backLineCollider = LineCollider(pos2 - 2 * t1 * normal, pos1 - 2 * t2 * normal, this);
         backLineCollider->owner = this;
     }
 }

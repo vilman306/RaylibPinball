@@ -32,29 +32,29 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
             events.ballBounce = true;
             ballPos.y = ballRad;
             ballVel.y *= -1;
-            ballVel.y *= BOUNCE_DAMPING;
+            // ballVel.y *= BOUNCE_DAMPING;
         }
-        if (ballPos.y + ballRad > Config::gameHeight) // Ball - upper edge
-        {
-            events.ballBounce = true;
-            ballPos.y = Config::gameHeight - ballRad;
-            ballVel.y *= -1;
-            ballVel.y *= BOUNCE_DAMPING;
-        }
-        if (ballPos.x + ballRad > Config::gameWidth) // Ball - right edge
-        {
-            events.ballBounce = true;
-            ballPos.x = Config::gameWidth - ballRad;
-            ballVel.x *= -1;
-            ballVel.x *= BOUNCE_DAMPING;
-        }
-        if (ballPos.x - ballRad < 0.0f) // Ball - left edge
-        {
-            events.ballBounce = true;
-            ballPos.x = ballRad;
-            ballVel.x *= -1;
-            ballVel.x *= BOUNCE_DAMPING;
-        }
+        // if (ballPos.y + ballRad > Config::gameHeight) // Ball - upper edge
+        // {
+        //     events.ballBounce = true;
+        //     ballPos.y = Config::gameHeight - ballRad;
+        //     ballVel.y *= -1;
+        //     ballVel.y *= BOUNCE_DAMPING;
+        // }
+        // if (ballPos.x + ballRad > Config::gameWidth) // Ball - right edge
+        // {
+        //     events.ballBounce = true;
+        //     ballPos.x = Config::gameWidth - ballRad;
+        //     ballVel.x *= -1;
+        //     ballVel.x *= BOUNCE_DAMPING;
+        // }
+        // if (ballPos.x - ballRad < 0.0f) // Ball - left edge
+        // {
+        //     events.ballBounce = true;
+        //     ballPos.x = ballRad;
+        //     ballVel.x *= -1;
+        //     ballVel.x *= BOUNCE_DAMPING;
+        // }
 
         // Ball - circle collision
         for (CircleCollider* circleCollider : circleColliders)
@@ -75,13 +75,14 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
                     Vector2 velN = normal * signedSpeedN;
                     Vector2 parallel = {-normal.y, normal.x};
                     Vector2 velP = Vector2DotProduct(ballVel, parallel) * parallel;
-                    ballVel = velP - velN * BOUNCE_DAMPING;
+                    float restitution = circleCollider->owner->material.restitution;
+                    ballVel = velP - velN * restitution;
                 }
 
                 if (circleCollider->role != CircleCollider::CircleColliderRole::FlipperTip)
                     continue;
 
-                Flipper* flipper = static_cast<Flipper*>(circleCollider->owner); // Warning! Will cause problems if line can have owners of different type than Flipper
+                Flipper* flipper = static_cast<Flipper*>(circleCollider->owner);
                 if (!(flipper->physicalAngle < flipper->maxAngle && flipper->physicalAngle > flipper->minAngle))
                     continue;
 
@@ -125,7 +126,8 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
                     Vector2 velN = normal * signedSpeedN;
                     Vector2 parallel = Vector2Normalize(v2);
                     Vector2 velP = Vector2DotProduct(ballVel, parallel) * parallel;
-                    ballVel = velP - velN * BOUNCE_DAMPING;
+                    float restitution = lineCollider->owner->material.restitution;
+                    ballVel = velP - velN * restitution;
                 }
                 
                 if (lineCollider->owner == nullptr)
@@ -178,8 +180,8 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
                 Vector2 velNB = normal * Vector2DotProduct(ballBVel, normal);
                 ballVel += (velNB - velN);
                 ballBVel += (velN - velNB);
-                ballVel *= BOUNCE_DAMPING;
-                ballBVel *= BOUNCE_DAMPING;
+                // ballVel *= BOUNCE_DAMPING;
+                // ballBVel *= BOUNCE_DAMPING;
                 
             }
         }

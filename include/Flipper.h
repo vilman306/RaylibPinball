@@ -2,7 +2,7 @@
 #include "raylib.h"
 #include "Colliders.h"
 
-struct Flipper
+struct Flipper : ColliderOwner
 {
     Flipper(Vector2 rotP, float len, Color c, int dir);
     void UpdatePhysics(float dtPhysics);
@@ -20,7 +20,6 @@ struct Flipper
     LineCollider lineUp; // used in physics
     LineCollider lineDown; // used in physics
     Color color;
-    const float restitution = 0.3f;
 
     bool rotateUp = false;
     int rotDir = 1; // 1: up, -1: down
@@ -31,4 +30,6 @@ struct Flipper
     float prevPhysicalAngle = minAngle;
     float visualAngle = minAngle;
     const int direction;              // 1: left flipper, -1: right flipper
+private:
+    const float restitution = 0.3f;
 };

@@ -2,7 +2,7 @@
 #include "raylib.h"
 #include "Colliders.h"
 
-struct Ball
+struct Ball : ColliderOwner
 {
 public:
     Ball(Vector2 pos, float rad, Vector2 vel, Color c);

@@ -5,7 +5,7 @@
 #include "Utils.h"
 
 Ball::Ball(Vector2 pos, float rad, Vector2 vel, Color c)
-    : circleCollider(pos, rad), velocity(vel)
+    : circleCollider(pos, rad, this), velocity(vel)
 {
     visualPosition = circleCollider.circle.position;
     prevPhysicalPosition = circleCollider.circle.position;

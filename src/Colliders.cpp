@@ -3,7 +3,7 @@
 #include "Utils.h"
 #include <iostream>
 
-CircleCollider::CircleCollider(Vector2 position, float radius) : circle(position, radius)
+CircleCollider::CircleCollider(Vector2 position, float radius, ColliderOwner* cOwner) : circle(position, radius), owner(cOwner)
 {
 }
 
@@ -13,11 +13,11 @@ void CircleCollider::Draw() // Should only be used for debugging
     DrawCircleV(screenPos, circle.radius, color);
 }
 
-LineCollider::LineCollider(Vector2 pos1, Vector2 pos2) : line(pos1, pos2)
+LineCollider::LineCollider(Vector2 pos1, Vector2 pos2, ColliderOwner* cOwner) : line(pos1, pos2), owner(cOwner)
 {
 }
 
-LineCollider::LineCollider(Line l) : line(l)
+LineCollider::LineCollider(Line l, ColliderOwner* cOwner) : line(l), owner(cOwner)
 {
 }
 

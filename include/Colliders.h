@@ -3,12 +3,19 @@
 #include "Vec2Extensions.h"
 #include "raymath.h"
 #include "Geometry.h"
+#include "PhysicsManager.h"
+
+struct ColliderOwner
+{
+    PhysicsMaterial material;
+    virtual ~ColliderOwner() = default;
+};
 
 struct CircleCollider
 {
-    CircleCollider(Vector2 position, float radius);
+    CircleCollider(Vector2 position, float radius, ColliderOwner* cOwner);
     Circle circle;
-    void* owner = nullptr;
+    ColliderOwner* owner;
     enum class CircleColliderRole { Generic, FlipperRot, FlipperTip };
     CircleColliderRole role = CircleColliderRole::Generic;
 
@@ -19,11 +26,11 @@ struct CircleCollider
 
 struct LineCollider
 {
-    LineCollider(Vector2 pos1, Vector2 pos2);
-    LineCollider(Line l);
+    LineCollider(Vector2 pos1, Vector2 pos2, ColliderOwner* cOwner);
+    LineCollider(Line l, ColliderOwner* cOwner);
     void UpdatePosition(Vector2 p1, Vector2 p2);
     Line line;
-    void* owner = nullptr;
+    ColliderOwner* owner;
     enum class LineColliderRole { Generic, FlipperUp, FlipperDown };
     LineColliderRole role = LineColliderRole::Generic;
 
