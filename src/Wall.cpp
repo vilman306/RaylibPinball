@@ -10,6 +10,7 @@ Wall::Wall(Vector2 pos1, Vector2 pos2, float circle1Rad, float circle2Rad, bool 
 
     float t1 = defaultThickness, t2 = defaultThickness;
 
+    // Set up colliders
     if (circle1Rad > 0.0f) {
         if (positionCircle1InPos1) {
             circle1Collider = CircleCollider(pos1, circle1Rad, this);

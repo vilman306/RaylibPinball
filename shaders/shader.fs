@@ -1,5 +1,7 @@
 #version 330
 
+// Simple bloom shader
+
 in vec2 fragTexCoord;
 out vec4 finalColor;
 

@@ -15,4 +15,6 @@ public:
     Vector2 visualPosition;
     Vector2 prevPhysicalPosition; // Previous position that "circle.position" was lerping to
     Vector2 resetPosition;
+
+    float lastNormalSpeed = 0.0f; // Used in AudioManager::HandleEvents
 };

@@ -14,15 +14,17 @@ void Referee::HandleEvents(std::vector<PhysicsEvents> physicsEventsPerBall)
     {
         for (ColliderOwner* hitOwner : physicsEvents.hitOwners)
         {
+            // Increase score if ball hit bumper
             if (auto* bumper = dynamic_cast<Bumper*>(hitOwner))
                 score += bumper->points;
         }
-
         Ball* ball = physicsEvents.ball;
         Vector2 ballPos = ball->circleCollider.circle.position;
         float ballRad = ball->circleCollider.circle.radius;
+        // Reset ball/game if ball has fallen out
         if (ballPos.y < -ballRad) {
             roundsPlayed += 1;
+            // Only reset game if there are no rounds left to play
             if (roundsPlayed == roundsPerGame) {
                 roundsPlayed = 0;
                 highScore = (score > highScore) ? score : highScore;

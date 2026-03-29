@@ -18,18 +18,6 @@ Flipper::Flipper(Vector2 rotP, float len, Color c, int dir)
     UpdateLineUpPosition(lineUp, physicalAngle);
     UpdateLineDownPosition(lineDown, physicalAngle);
 
-    // Vector2 normal = {-direction * lineDir.y, direction * lineDir.x};
-    // if (direction == 1)
-    // { // set line points in specific order so line gets wanted normal
-    //     lineUp = LineCollider(rotPos + normal * rotRadius, tipPos + normal * tipRadius, c);
-    //     lineDown = LineCollider(tipPos - normal * tipRadius, rotPos - normal * rotRadius, c);
-    // }
-    // else
-    // {
-    //     lineUp = LineCollider(tipPos + normal * tipRadius, rotPos + normal * rotRadius, c);
-    //     lineDown = LineCollider(rotPos - normal * rotRadius, tipPos - normal * tipRadius, c);
-    // }
-
     circleRot.owner = this;
     circleTip.owner = this;
     circleRot.role = CircleCollider::CircleColliderRole::FlipperRot;
@@ -77,8 +65,6 @@ void Flipper::UpdateLineDownPosition(LineCollider &line, float angle)
 
 void Flipper::Draw()
 {
-
-    // USE CIRCLES INSTEAD OF COLLIDERS
     DrawCircleV(Utils::WorldToScreen(circleRot.circle.position), rotRadius, color);
 
     CircleCollider visualCircleTip({0.0f, 0.0f}, tipRadius, this);
@@ -95,14 +81,6 @@ void Flipper::Draw()
     Vector2 p4 = Utils::WorldToScreen(visualLineUp.line.pos2);
     Vector2 points[4] = {p1, p2, p3, p4};
     DrawTriangleFan(points, 4, color);
-
-    // float padding = 200.0f;
-    // Vector2 leftUp = Utils::WorldToScreen({padding, Config::gameHeight - padding});
-    // Vector2 leftDown = Utils::WorldToScreen({padding, padding});
-    // Vector2 RightDown = Utils::WorldToScreen({Config::gameWidth / 2.0f - padding, padding});
-    // Vector2 RightUp = Utils::WorldToScreen({Config::gameWidth / 2.0f - padding, Config::gameHeight - padding});
-    // Rectangle testRec = {leftUp.x, leftUp.y, abs(RightDown.x - leftUp.x), abs(RightDown.y - leftUp.y)};
-    // DrawRectanglePro(testRec, {0.0f, 0.0f}, 2.03f, BROWN);
 }
 
 

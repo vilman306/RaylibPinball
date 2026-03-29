@@ -20,44 +20,14 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
 
         events.ball = ball;
 
-        Vector2 ballAcc = {0, -GRAVITY};          // Virtual ball acceleration
-        Vector2 ballVel = ball->velocity;         // Virtual ball velocity
-        Vector2 ballPos = ball->circleCollider.circle.position; // Virtual ball position
+        Vector2 ballAcc = {0, -GRAVITY};
+        Vector2 ballVel = ball->velocity;
+        Vector2 ballPos = ball->circleCollider.circle.position;
         float ballRad = ball->circleCollider.circle.radius;
 
 
         ballVel += ballAcc * dt;
         ballPos += ballVel * dt;
-
-        // Ball - edge collision:
-        // if (ballPos.y - ballRad < 0.0f) // Ball - bottom edge
-        // {
-        //     ballPos.y = ballRad;
-        //     ballVel.y *= -1;
-        //     ballVel.y *= 0.2;
-        //     // ballVel.y *= BOUNCE_DAMPING;
-        // }
-        // if (ballPos.y + ballRad > Config::gameHeight) // Ball - upper edge
-        // {
-        //     events.ballBounce = true;
-        //     ballPos.y = Config::gameHeight - ballRad;
-        //     ballVel.y *= -1;
-        //     ballVel.y *= BOUNCE_DAMPING;
-        // }
-        // if (ballPos.x + ballRad > Config::gameWidth) // Ball - right edge
-        // {
-        //     events.ballBounce = true;
-        //     ballPos.x = Config::gameWidth - ballRad;
-        //     ballVel.x *= -1;
-        //     ballVel.x *= BOUNCE_DAMPING;
-        // }
-        // if (ballPos.x - ballRad < 0.0f) // Ball - left edge
-        // {
-        //     events.ballBounce = true;
-        //     ballPos.x = ballRad;
-        //     ballVel.x *= -1;
-        //     ballVel.x *= BOUNCE_DAMPING;
-        // }
 
         // Ball - circle collision
         for (CircleCollider* circleCollider : circleColliders)
@@ -87,6 +57,7 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
                     }
                 }
 
+                // Add extra velocity to the ball if circleCollider is the tip of a Flipper
                 if (circleCollider->role != CircleCollider::CircleColliderRole::FlipperTip)
                     continue;
 
@@ -139,30 +110,31 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
                     ballVel = velP - velN * restitution;
                 }
                 
-                if (lineCollider->owner == nullptr)
-                    continue;
+                // Add extra velocity to ball if the lineCollider belongs to a Flipper
+                if (auto* flipper = dynamic_cast<Flipper*>(lineCollider->owner))
+                {
+                    flipper = static_cast<Flipper*>(lineCollider->owner);
+                    if (!(flipper->physicalAngle < flipper->maxAngle && flipper->physicalAngle > flipper->minAngle))
+                        continue;
 
-                Flipper* flipper = static_cast<Flipper*>(lineCollider->owner); // Warning! Will cause problems if line can have owners of different type than Flipper
-                if (!(flipper->physicalAngle < flipper->maxAngle && flipper->physicalAngle > flipper->minAngle))
-                    continue;
+                    Vector2 r = p - flipper->rotPos;
+                    float rLen = Vector2Length(r);
+                    
+                    int flipperSide = 1;
+                    if (lineCollider->role == LineCollider::LineColliderRole::FlipperDown)
+                        flipperSide *= -1;
 
-                Vector2 r = p - flipper->rotPos;
-                float rLen = Vector2Length(r);
-                
-                int flipperSide = 1;
-                if (lineCollider->role == LineCollider::LineColliderRole::FlipperDown)
-                    flipperSide *= -1;
+                    int flipperDir = flipper->direction;
+                    Vector2 rNormal = Vector2Normalize({-r.y, r.x}) * flipperDir * flipperSide;
 
-                int flipperDir = flipper->direction;
-                Vector2 rNormal = Vector2Normalize({-r.y, r.x}) * flipperDir * flipperSide;
+                    float rSpeed = flipper->angularSpeed * rLen;
+                    Vector2 rVel = rNormal * rSpeed * flipper->rotDir * flipperSide;
 
-                float rSpeed = flipper->angularSpeed * rLen;
-                Vector2 rVel = rNormal * rSpeed * flipper->rotDir * flipperSide;
-
-                // Add only the component that pushes the ball outward
-                float push = Vector2DotProduct(rVel, normal);
-                if (push > 0.0f) {
-                    ballVel += normal * push * ballFlipperTuning;
+                    // Add only the component that pushes the ball outward
+                    float push = Vector2DotProduct(rVel, normal);
+                    if (push > 0.0f) {
+                        ballVel += normal * push * ballFlipperTuning;
+                    }
                 }
             }
         }
@@ -190,12 +162,8 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
                 Vector2 velNB = normal * Vector2DotProduct(ballBVel, normal);
                 ballVel += (velNB - velN);
                 ballBVel += (velN - velNB);
-                // ballVel *= BOUNCE_DAMPING;
-                // ballBVel *= BOUNCE_DAMPING;
-                
             }
         }
-
 
         // Assign the ball's new position and velocity
         ball->prevPhysicalPosition = ball->circleCollider.circle.position;

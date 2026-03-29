@@ -15,10 +15,10 @@ struct Flipper : ColliderOwner
     Vector2 tipPos;
     const float rotRadius = 10.0f;
     const float tipRadius = 8.0f;
-    CircleCollider circleRot; // used in physics
-    CircleCollider circleTip; // used in physics
-    LineCollider lineUp; // used in physics
-    LineCollider lineDown; // used in physics
+    CircleCollider circleRot;
+    CircleCollider circleTip;
+    LineCollider lineUp;
+    LineCollider lineDown;
     Color color;
 
     bool rotateUp = false;

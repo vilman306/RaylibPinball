@@ -45,7 +45,6 @@ Game::Game() : referee(this)
     float flipperLen = 80.0f;
     float flipperSepDistX = 25.0f;
     float flipperHeight = 80.0f;
-
     Flipper* flipperL = AddFlipper({gameWidth / 2.0f - (flipperLen + flipperSepDistX), flipperHeight}, // Store on heap so that adding to "flippers" won't change memory location of "flipperL"
                                     flipperLen, VIOLET, 1);
     
@@ -80,19 +79,18 @@ void Game::Run()
 
 void Game::Update()
 {
-    // if (IsKeyPressed(KEY_D))
-    //     balls[0]->velocity.x += 200.0f;
-    // if (IsKeyPressed(KEY_A))
-    //     balls[0]->velocity.x -= 200.0f;
-    // if (IsKeyPressed(KEY_W))
-    //     balls[0]->velocity.y += 200.0f;
-    // if (IsKeyPressed(KEY_S))
-    //     balls[0]->velocity.y -= 200.0f;
-    // if (IsKeyPressed(KEY_SPACE)) {
-    //     balls[0]->circleCollider.circle.position = {Config::gameWidth / 2.0f - 120.0f, 420.0f};
-    //     balls[0]->velocity = {100.0f, 0.0f};
-    // }
+    #ifdef DEBUG
+        if (IsKeyPressed(KEY_D))
+            balls[0]->velocity.x += 200.0f;
+        if (IsKeyPressed(KEY_A))
+            balls[0]->velocity.x -= 200.0f;
+        if (IsKeyPressed(KEY_W))
+            balls[0]->velocity.y += 200.0f;
+        if (IsKeyPressed(KEY_S))
+            balls[0]->velocity.y -= 200.0f;
+    #endif
 
+    // Launch/"serve" ball
     if (referee.isServing) {
         if (IsKeyPressed(KEY_SPACE)) {
             balls[0]->velocity = {0.0f, servePower};
@@ -100,6 +98,7 @@ void Game::Update()
         }
     }
 
+    // Rotate flippers
     bool leftDown = IsKeyDown(KEY_LEFT);
     bool rightDown = IsKeyDown(KEY_RIGHT);
     for (Flipper* flipper : flippers)
@@ -133,18 +132,6 @@ void Game::Update()
         dtSum -= dtPhysics;
     }
 
-    // // Play ballBounce sound if ball collided
-    // if (physicsEvents.ballBounce)
-    // {
-    //     float ballSpeed = Vector2Length(ball.velocity);
-    //     float bounceVolume = ballSpeed / PhysicsManager::MAX_BALL_SPEED;
-    //     float minSoundLevel = 0.01f;
-    //     if (bounceVolume >= minSoundLevel) {
-    //         SetSoundVolume(audioManager.ballBounce, bounceVolume);
-    //         PlaySound(audioManager.ballBounce);
-    //     }
-    // }
-
     // Lerp ball positions between its previous and current physical positions:
     float lerpFactor = dtSum / dtPhysics;
     for (Ball* ball : balls)
@@ -156,7 +143,6 @@ void Game::Update()
     {
         flipper->visualAngle = Lerp(flipper->prevPhysicalAngle, flipper->physicalAngle, lerpFactor);
     }
-
 
     prevTime = time;
 }
@@ -178,7 +164,6 @@ void Game::Draw()
         camera.offset = {textureWidth / 2.0f, textureHeight / 2.0f};
         camera.zoom = std::min(textureWidth / gameWidth, textureHeight / gameHeight);
 
-          
         BeginMode2D(camera);
             // Borders
             int borderLen = 30000;
@@ -188,12 +173,13 @@ void Game::Draw()
             DrawRectangle(-borderLen, -borderLen, (int)gameWidth + borderLen, borderLen, borderColor); // Up
             DrawRectangle(-borderLen, (int)gameHeight, (int)gameWidth + borderLen, borderLen, borderColor); // Bottom
 
-            // for (LineCollider* line : lineColliders)
-            //     line->Draw();
+            #ifdef DEBUG
+                for (LineCollider* line : lineColliders)
+                    line->Draw();
 
-            // for (CircleCollider* circle : circleColliders)
-            //     circle->Draw();
-            
+                for (CircleCollider* circle : circleColliders)
+                    circle->Draw();
+            #endif
         EndMode2D();
 
 
@@ -201,13 +187,12 @@ void Game::Draw()
 
         int fontSize1 = (int)(15 * fontScaling);
         // Show fps
-        std::string fps = std::to_string(GetFPS());
-        DrawText(fps.c_str(), 10, 10, fontSize1, PURPLE);
+        std::string fpsText = "FPS: " + std::to_string(GetFPS());
+        DrawText(fpsText.c_str(), 10, 10, fontSize1, PURPLE);
         // Show time
         DrawText(std::to_string(time).c_str(), screenWidth - 130, 10, fontSize1, PURPLE);
 
         int fontSize2 = (int)(50 * fontScaling);
-
         int padding = (int)(50 * fontScaling);
         int padding2 = (int)(430 * fontScaling);
         int fontPosXLeft = padding;
@@ -238,21 +223,18 @@ void Game::Draw()
                 
             for (Flipper* flipper : flippers)
                 flipper->Draw();
-
         EndMode2D();
     EndTextureMode();
 
     BeginDrawing();
         DrawTexturePro(renderTexture.texture, {0, 0, (float)renderTexture.texture.width, -(float)renderTexture.texture.height}, {0, 0, (float)screenWidth, (float)screenHeight}, {0, 0}, 0.0f, WHITE);
-        
-        BeginShaderMode(shader);
-            DrawTexturePro(shaderRenderTexture.texture, {0, 0, (float)shaderRenderTexture.texture.width, -(float)shaderRenderTexture.texture.height}, {0, 0, (float)screenWidth, (float)screenHeight}, {0, 0}, 0.0f, WHITE);
-           
+            BeginShaderMode(shader);
+                DrawTexturePro(shaderRenderTexture.texture, {0, 0, (float)shaderRenderTexture.texture.width, -(float)shaderRenderTexture.texture.height}, {0, 0, (float)screenWidth, (float)screenHeight}, {0, 0}, 0.0f, WHITE);
         EndShaderMode();
     EndDrawing();
 }
 
-void Game::GetScreenDimensions()
+void Game::GetScreenDimensions() // Is called when the screen resolution changes. Updates related variables.
 {
     int newWidth = GetScreenWidth();
     int newHeight = GetScreenHeight();

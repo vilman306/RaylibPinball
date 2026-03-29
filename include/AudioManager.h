@@ -1,7 +1,9 @@
 #pragma once
 #include "raylib.h"
+#include <vector>
+#include "PhysicsManager.h"
 
-class AudioManager
+class AudioManager // Not used (yet)
 {
 public:
     Sound ballBounce;
