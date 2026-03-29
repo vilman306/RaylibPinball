@@ -1,5 +1,4 @@
 #include "raylib.h"
-#include "raymath.h"
 #include "PhysicsManager.h"
 #include "Ball.h"
 #include "Vec2Extensions.h"
@@ -25,7 +24,6 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
         Vector2 ballPos = ball->circleCollider.circle.position;
         float ballRad = ball->circleCollider.circle.radius;
 
-
         ballVel += ballAcc * dt;
         ballPos += ballVel * dt;
 
@@ -45,8 +43,8 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
 
                 float signedSpeedN = Vector2DotProduct(ballVel, normal);
 
-                if (signedSpeedN < 0.0f)
-                { // To prevent bugs if flipper moves into ball while ball is traveling from flipper
+                if (signedSpeedN < 0.0f) // To prevent bugs if flipper moves into ball while ball is traveling away from flipper
+                {
                     Vector2 velN = normal * signedSpeedN;
                     Vector2 parallel = {-normal.y, normal.x};
                     Vector2 velP = Vector2DotProduct(ballVel, parallel) * parallel;
@@ -113,16 +111,13 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
                 // Add extra velocity to ball if the lineCollider belongs to a Flipper
                 if (auto* flipper = dynamic_cast<Flipper*>(lineCollider->owner))
                 {
-                    flipper = static_cast<Flipper*>(lineCollider->owner);
                     if (!(flipper->physicalAngle < flipper->maxAngle && flipper->physicalAngle > flipper->minAngle))
                         continue;
 
                     Vector2 r = p - flipper->rotPos;
                     float rLen = Vector2Length(r);
-                    
-                    int flipperSide = 1;
-                    if (lineCollider->role == LineCollider::LineColliderRole::FlipperDown)
-                        flipperSide *= -1;
+
+                    int flipperSide = (lineCollider->role == LineCollider::LineColliderRole::FlipperDown) ? -1 : 1;
 
                     int flipperDir = flipper->direction;
                     Vector2 rNormal = Vector2Normalize({-r.y, r.x}) * flipperDir * flipperSide;
