@@ -7,6 +7,7 @@
 #include "Colliders.h"
 #include "Flipper.h"
 #include "Wall.h"
+#include "Bumper.h"
 
 
 
@@ -26,6 +27,8 @@ private:
     Flipper* AddFlipper(Vector2 rotP, float len, Color c, int dir);
     void AddLevelWalls(Flipper* flipperL, Flipper* flipperR, Color wallColor);
     Wall* AddWall(Vector2 pos1, Vector2 pos2, float circle1Rad, float circle2Rad, bool positionCircle1InPos1, bool positionCircle2InPos2, bool hasBackline, Color c);
+    void AddLevelBumpers();
+    Bumper* AddBumper(Vector2 pos, float rad, Color c);
     // RenderTexture2D renderTexture; // Texture to draw on (which then is scaled to actual window size)
     Camera2D camera;
     PhysicsManager physicsManager;
@@ -41,6 +44,7 @@ private:
     std::vector<CircleCollider*> circleColliders; // stationary (or attached to flippers)
     std::vector<Wall*> walls;
     std::vector<Flipper*> flippers;
+    std::vector<Bumper*> bumpers;
     double time;
     const float targetFPS = 200;
 };

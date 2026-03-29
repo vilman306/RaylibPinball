@@ -52,7 +52,11 @@ Game::Game()
                                     flipperLen, VIOLET, -1);
     
     AddLevelWalls(flipperL, flipperR, MAGENTA);
+
+    AddLevelBumpers();
+
 }
+
 
 
 
@@ -140,22 +144,7 @@ void Game::Update()
     prevTime = time;
 }
 
-void Game::GetScreenDimensions()
-{
-    int newWidth = GetScreenWidth();
-    int newHeight = GetScreenHeight();
-    if (newWidth != screenWidth || newHeight != screenHeight)
-    {
-        screenWidth = newWidth;
-        screenHeight = newHeight;
-        UnloadRenderTexture(renderTexture);
-        renderTexture = LoadRenderTexture(screenWidth, screenHeight);
-        UnloadRenderTexture(shaderRenderTexture);
-        shaderRenderTexture = LoadRenderTexture(screenWidth, screenHeight);
-        float res[2] = { (float)screenWidth, (float)screenHeight };
-        SetShaderValue(shader, shaderResLoc, res, SHADER_UNIFORM_VEC2);
-    }
-}
+
 
 void Game::Draw()
 {
@@ -211,6 +200,10 @@ void Game::Draw()
             
             for (Wall* wall : walls)
                 wall->Draw();
+
+            for (Bumper* bumper : bumpers)
+                bumper->Draw();
+
         EndMode2D();
     EndTextureMode();
 
@@ -224,8 +217,48 @@ void Game::Draw()
     EndDrawing();
 }
 
+void Game::GetScreenDimensions()
+{
+    int newWidth = GetScreenWidth();
+    int newHeight = GetScreenHeight();
+    if (newWidth != screenWidth || newHeight != screenHeight)
+    {
+        screenWidth = newWidth;
+        screenHeight = newHeight;
+        UnloadRenderTexture(renderTexture);
+        renderTexture = LoadRenderTexture(screenWidth, screenHeight);
+        UnloadRenderTexture(shaderRenderTexture);
+        shaderRenderTexture = LoadRenderTexture(screenWidth, screenHeight);
+        float res[2] = { (float)screenWidth, (float)screenHeight };
+        SetShaderValue(shader, shaderResLoc, res, SHADER_UNIFORM_VEC2);
+    }
+}
 
 
+void Game::AddLevelBumpers()
+{
+    float gameHeight = Config::gameHeight;
+    float gameWidth = Config::gameWidth;
+    float hC = gameHeight - 350.0f;
+    float r = 30.0f;
+    Color bumperColor = GREEN;
+    Bumper* bumperC = AddBumper({gameWidth / 2.0f, hC}, r, bumperColor);
+    float d = 150.0f;
+    float hL = gameHeight - 200.0f;
+    float hR = hL;
+    Bumper* bumperL = AddBumper({gameWidth / 2.0f - d, hL}, r, bumperColor);
+    Bumper* bumperR = AddBumper({gameWidth / 2.0f + d, hR}, r, bumperColor);
+    Bumper* bumperLL = AddBumper({gameWidth / 2.0f - 2*d, hC}, r, bumperColor);
+    Bumper* bumperRR = AddBumper({gameWidth / 2.0f + 2*d, hC}, r, bumperColor);
+}
+
+Bumper* Game::AddBumper(Vector2 pos, float rad, Color c)
+{
+    Bumper* bumper = new Bumper(pos, rad, c);
+    bumpers.push_back(bumper);
+    circleColliders.push_back(&bumper->circleCollider);
+    return bumper;
+}
 
 void Game::AddLevelWalls(Flipper* flipperL, Flipper* flipperR, Color wallColor)
 {
@@ -262,6 +295,8 @@ void Game::AddLevelWalls(Flipper* flipperL, Flipper* flipperR, Color wallColor)
     Wall* w7 = AddWall(w6R->GetPos2(), w6L->GetPos1(), 0.0f, 0.0f, false, false, false, wallColor);
     float h8 = 10.0f;
     Wall* w8 = AddWall({x4, h8}, {x5R, h8}, 0.0f, 0.0f, false, false, false, wallColor);
+    float h9 = 50.0f;
+    Wall* w9 = AddWall(w3->GetPos2(), {x5R, w3->GetPos2().y + h9}, 0.0f, 0.0f, false, false, false, wallColor);
 }
 
 Flipper* Game::AddFlipper(Vector2 rotP, float len, Color c, int dir)
@@ -304,6 +339,8 @@ Game::~Game()
         delete flipper;
     for (Wall* wall : walls)
         delete wall;
+    for (Bumper* bumper : bumpers)
+        delete bumper;
     UnloadRenderTexture(renderTexture);
     UnloadShader(shader);
     audioManager.Unload();

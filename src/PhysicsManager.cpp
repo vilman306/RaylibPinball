@@ -6,6 +6,7 @@
 #include "Config.h"
 #include "Flipper.h"
 #include <iostream>
+#include "Bumper.h"
 
 std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std::vector<LineCollider*>& lineColliders, std::vector<CircleCollider*>& circleColliders)
 {
@@ -32,6 +33,7 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
             events.ballBounce = true;
             ballPos.y = ballRad;
             ballVel.y *= -1;
+            ballVel.y *= 0.2;
             // ballVel.y *= BOUNCE_DAMPING;
         }
         // if (ballPos.y + ballRad > Config::gameHeight) // Ball - upper edge
@@ -77,6 +79,9 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
                     Vector2 velP = Vector2DotProduct(ballVel, parallel) * parallel;
                     float restitution = circleCollider->owner->material.restitution;
                     ballVel = velP - velN * restitution;
+                    if (auto* bumper = dynamic_cast<Bumper*>(circleCollider->owner)) {
+                        ballVel += bumper->impulse * normal;
+                    }
                 }
 
                 if (circleCollider->role != CircleCollider::CircleColliderRole::FlipperTip)

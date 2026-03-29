@@ -22,7 +22,7 @@ public:
     // static constexpr float BOUNCE_DAMPING = 0.6f;
     static constexpr double dt = 1.0/600.0; // Fixed delta time
     
-    const float ballFlipperTuning = 0.05f;
+    const float ballFlipperTuning = 0.08f;
 
     std::vector<PhysicsEvents> Update(std::vector<Ball*> &balls, std::vector<LineCollider*> &lineColliders, std::vector<CircleCollider*> &circles);
 
