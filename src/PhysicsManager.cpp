@@ -19,7 +19,7 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
 
         events.ball = ball;
 
-        Vector2 ballAcc = {0, -GRAVITY};
+        Vector2 ballAcc = {0, -gravity};
         Vector2 ballVel = ball->velocity;
         Vector2 ballPos = ball->circleCollider.circle.position;
         float ballRad = ball->circleCollider.circle.radius;

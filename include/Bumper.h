@@ -6,7 +6,7 @@ struct Bumper : ColliderOwner {
     Bumper(Vector2 pos, float rad, Color c);
     void Draw();
 
-    CircleCollider circleCollider; // Collider
+    CircleCollider circleCollider;
 
     Color color;
     float impulse = 300.0f;
