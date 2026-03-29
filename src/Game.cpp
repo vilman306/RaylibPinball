@@ -26,9 +26,7 @@ Game::Game() : referee(this)
     InitAudioDevice();
 
     SetTargetFPS(Config::targetFPS);
-
-    // audioManager.Load();
-    
+   
     camera.target = {gameWidth / 2.0f, gameHeight / 2.0f};
     camera.rotation = 0.0f;
     
@@ -230,7 +228,7 @@ void Game::Draw()
         DrawTexturePro(renderTexture.texture, {0, 0, (float)renderTexture.texture.width, -(float)renderTexture.texture.height}, {0, 0, (float)screenWidth, (float)screenHeight}, {0, 0}, 0.0f, WHITE);
             BeginShaderMode(shader);
                 DrawTexturePro(shaderRenderTexture.texture, {0, 0, (float)shaderRenderTexture.texture.width, -(float)shaderRenderTexture.texture.height}, {0, 0, (float)screenWidth, (float)screenHeight}, {0, 0}, 0.0f, WHITE);
-        EndShaderMode();
+            EndShaderMode();
     EndDrawing();
 }
 
@@ -361,7 +359,6 @@ Game::~Game()
         delete bumper;
     UnloadRenderTexture(renderTexture);
     UnloadShader(shader);
-    // audioManager.Unload();
     CloseAudioDevice();
     CloseWindow();
 }

@@ -2,7 +2,6 @@
 #include "raylib.h"
 #include "Ball.h"
 #include "PhysicsManager.h"
-#include "AudioManager.h"
 #include <vector>
 #include "Colliders.h"
 #include "Flipper.h"
@@ -31,7 +30,6 @@ private:
     Bumper* AddBumper(Vector2 pos, float rad, Color c);
     Camera2D camera;
     PhysicsManager physicsManager;
-    AudioManager audioManager;
     RenderTexture renderTexture;
     RenderTexture shaderRenderTexture;
     Shader shader;
