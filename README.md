@@ -10,3 +10,5 @@ A simple pinball game with its own physics engine, built in C++ with raylib.
 # Controls
 * Left/right arrow - rotate left/right flipper
 * Spacebar - launch ball
+
+![Gameplay](readmeContent/Gameplay.gif)
