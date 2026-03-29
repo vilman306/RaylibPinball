@@ -46,6 +46,7 @@ private:
     std::vector<Bumper*> bumpers;
     Referee referee;
     double time;
+    float servePower = 1500.0f;
     
     Vector2 ballResetPosition;
 };

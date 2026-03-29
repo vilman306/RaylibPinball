@@ -61,7 +61,7 @@ Game::Game() : referee(this)
 void Game::ResetBall(Ball* ball)
 {
     ball->velocity = {0.0f, 0.0f};
-    Vector2 resetPos = {1395.0f, 300.0f};
+    Vector2 resetPos = {1395.0f, 100.0f};
     ball->resetPosition = resetPos;
     ball->circleCollider.circle.position = resetPos;
     ball->prevPhysicalPosition = resetPos;
@@ -80,17 +80,24 @@ void Game::Run()
 
 void Game::Update()
 {
-    if (IsKeyPressed(KEY_D))
-        balls[0]->velocity.x += 200.0f;
-    if (IsKeyPressed(KEY_A))
-        balls[0]->velocity.x -= 200.0f;
-    if (IsKeyPressed(KEY_W))
-        balls[0]->velocity.y += 200.0f;
-    if (IsKeyPressed(KEY_S))
-        balls[0]->velocity.y -= 200.0f;
-    if (IsKeyPressed(KEY_SPACE)) {
-        balls[0]->circleCollider.circle.position = {Config::gameWidth / 2.0f - 120.0f, 420.0f};
-        balls[0]->velocity = {100.0f, 0.0f};
+    // if (IsKeyPressed(KEY_D))
+    //     balls[0]->velocity.x += 200.0f;
+    // if (IsKeyPressed(KEY_A))
+    //     balls[0]->velocity.x -= 200.0f;
+    // if (IsKeyPressed(KEY_W))
+    //     balls[0]->velocity.y += 200.0f;
+    // if (IsKeyPressed(KEY_S))
+    //     balls[0]->velocity.y -= 200.0f;
+    // if (IsKeyPressed(KEY_SPACE)) {
+    //     balls[0]->circleCollider.circle.position = {Config::gameWidth / 2.0f - 120.0f, 420.0f};
+    //     balls[0]->velocity = {100.0f, 0.0f};
+    // }
+
+    if (referee.isServing) {
+        if (IsKeyPressed(KEY_SPACE)) {
+            balls[0]->velocity = {0.0f, servePower};
+            referee.isServing = false;
+        }
     }
 
     bool leftDown = IsKeyDown(KEY_LEFT);
@@ -174,8 +181,8 @@ void Game::Draw()
           
         BeginMode2D(camera);
             // Borders
-            int borderLen = 5000;
-            Color borderColor = DARKGRAY;
+            int borderLen = 30000;
+            Color borderColor = BLACK;
             DrawRectangle(-borderLen, -borderLen, borderLen, 2 * borderLen, borderColor); // Left
             DrawRectangle((int)gameWidth, -borderLen, borderLen, 2 * borderLen, borderColor);    // Right
             DrawRectangle(-borderLen, -borderLen, (int)gameWidth + borderLen, borderLen, borderColor); // Up
@@ -189,20 +196,32 @@ void Game::Draw()
             
         EndMode2D();
 
+
+        float fontScaling = std::min((float)screenWidth / gameWidth, (float)screenHeight / gameHeight);
+
+        int fontSize1 = (int)(15 * fontScaling);
         // Show fps
         std::string fps = std::to_string(GetFPS());
-        DrawText(fps.c_str(), 10, 10, 15, PURPLE);
+        DrawText(fps.c_str(), 10, 10, fontSize1, PURPLE);
         // Show time
-        DrawText(std::to_string(time).c_str(), screenWidth - 80, 10, 15, PURPLE);
+        DrawText(std::to_string(time).c_str(), screenWidth - 130, 10, fontSize1, PURPLE);
 
+        int fontSize2 = (int)(50 * fontScaling);
+
+        int padding = (int)(50 * fontScaling);
+        int padding2 = (int)(430 * fontScaling);
+        // int fontPosXLeft = (screenWidth > gameWidth) ? (screenWidth - gameWidth + padding) : padding;
+        int fontPosXLeft = padding;
+        int fontPosXRight = screenWidth - padding2;
+        int fontPosY = screenHeight / 2;
         // Show score
         int score = referee.score;
         std::string scoreText = "Score: " + std::to_string(score);
-        DrawText(scoreText.c_str(), 10, gameHeight / 2, 25, PURPLE);
+        DrawText(scoreText.c_str(), fontPosXLeft, fontPosY, fontSize2, PURPLE);
         // Show high score
         int highScore = referee.highScore;
         std::string highScoreText = "High score: " + std::to_string(highScore);
-        DrawText(highScoreText.c_str(), gameWidth - 80, gameHeight / 2, 25, PURPLE);
+        DrawText(highScoreText.c_str(), fontPosXRight, fontPosY, fontSize2, PURPLE);
 
     EndTextureMode();
 
@@ -283,7 +302,7 @@ void Game::AddLevelWalls(Flipper* flipperL, Flipper* flipperR, Color wallColor)
     Vector2 rotPosL = flipperL->circleRot.circle.position;
     Vector2 rotPosR = flipperR->circleRot.circle.position;
     float d1 = 200.0f;
-    float h1 = 200.0f;
+    float h1 = 150.0f;
     float rotRad = flipperL->rotRadius;
     Wall* w1L = AddWall({rotPosL.x - d1, rotPosL.y + h1}, rotPosL, 0.0f, rotRad, false, true, false, wallColor); // Left
     Wall* w1R = AddWall(rotPosR, {rotPosR.x + d1, rotPosR.y + h1}, rotRad, 0.0f, true, false, false, wallColor); // Right

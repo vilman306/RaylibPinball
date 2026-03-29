@@ -28,6 +28,7 @@ void Referee::HandleEvents(std::vector<PhysicsEvents> physicsEventsPerBall)
                 highScore = (score > highScore) ? score : highScore;
                 score = 0;
             }
+            isServing = true;
             game->ResetBall(ball);   
         }
     }

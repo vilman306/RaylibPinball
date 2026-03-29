@@ -12,6 +12,7 @@ public:
     const int roundsPerGame = 3;
     int roundsPlayed = 0;
     int highScore = 0;
+    bool isServing = true;
 private:
     Game* game;
 };

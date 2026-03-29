@@ -20,5 +20,5 @@ struct Wall : ColliderOwner
     Vector2 GetPos1() { return lineCollider.line.pos1; };
     Vector2 GetPos2() { return lineCollider.line.pos2; };
 private:
-    const float restitution = 0.4f;
+    const float restitution = 0.3f;
 };

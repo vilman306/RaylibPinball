@@ -31,5 +31,5 @@ struct Flipper : ColliderOwner
     float visualAngle = minAngle;
     const int direction;              // 1: left flipper, -1: right flipper
 private:
-    const float restitution = 0.2f;
+    const float restitution = 0.3f;
 };
