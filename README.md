@@ -1,5 +1,7 @@
 A simple pinball game with its own physics engine, built in C++ with raylib.
 
+![Gameplay](readmeContent/Gameplay.gif)
+
 # Features
 * A custom physics engine
 * A level prototype
