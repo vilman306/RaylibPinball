@@ -8,7 +8,7 @@
 #include "Flipper.h"
 #include "Wall.h"
 #include "Bumper.h"
-
+#include "Referee.h"
 
 
 class Game
@@ -17,7 +17,7 @@ public:
     Game();
     ~Game();
     void Run();
-    // void DrawScaledRenderTexture();
+    void ResetBall(Ball* ball);
     
 private:
     void Update();
@@ -29,7 +29,6 @@ private:
     Wall* AddWall(Vector2 pos1, Vector2 pos2, float circle1Rad, float circle2Rad, bool positionCircle1InPos1, bool positionCircle2InPos2, bool hasBackline, Color c);
     void AddLevelBumpers();
     Bumper* AddBumper(Vector2 pos, float rad, Color c);
-    // RenderTexture2D renderTexture; // Texture to draw on (which then is scaled to actual window size)
     Camera2D camera;
     PhysicsManager physicsManager;
     AudioManager audioManager;
@@ -45,6 +44,8 @@ private:
     std::vector<Wall*> walls;
     std::vector<Flipper*> flippers;
     std::vector<Bumper*> bumpers;
+    Referee referee;
     double time;
-    const float targetFPS = 200;
+    
+    Vector2 ballResetPosition;
 };

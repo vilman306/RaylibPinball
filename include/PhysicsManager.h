@@ -4,6 +4,7 @@
 struct Ball;
 struct LineCollider;
 struct CircleCollider;
+struct ColliderOwner;
 
 struct PhysicsMaterial {
   float restitution = 1.0f;
@@ -11,7 +12,8 @@ struct PhysicsMaterial {
 
 struct PhysicsEvents // For use with PhysicsManager::Update
 {
-    bool ballBounce = false; // true if ball collided with anything
+    Ball* ball;
+    std::vector<ColliderOwner*> hitOwners; // contains the owners of the colliders that the ball collided with
 };
 
 class PhysicsManager

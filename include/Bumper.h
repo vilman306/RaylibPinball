@@ -9,5 +9,6 @@ struct Bumper : ColliderOwner {
     CircleCollider circleCollider; // Collider
 
     Color color;
-    float impulse = 700.0f;
+    float impulse = 300.0f;
+    int points = 50;
 };

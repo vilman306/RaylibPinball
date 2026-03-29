@@ -10,4 +10,6 @@ namespace Config
     constexpr const char* windowTitle = "Pinball Game";
 
     const float dtDebug = PhysicsManager::dt / 4.0;
+
+    const float targetFPS = 200;
 }

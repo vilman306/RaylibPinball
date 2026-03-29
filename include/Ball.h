@@ -13,6 +13,6 @@ public:
     
     Color color;
     Vector2 visualPosition;
-    Vector2 physicalPosition; // Target position that "circle.position" is lerping to. This is the ball's physical position.
     Vector2 prevPhysicalPosition; // Previous position that "circle.position" was lerping to
+    Vector2 resetPosition;
 };

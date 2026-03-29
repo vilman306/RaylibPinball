@@ -12,7 +12,7 @@
 // #define DEBUG
 
 
-Game::Game()
+Game::Game() : referee(this)
 {
     screenWidth = 1200;
     screenHeight = 800;
@@ -25,7 +25,7 @@ Game::Game()
     
     InitAudioDevice();
 
-    SetTargetFPS(targetFPS);
+    SetTargetFPS(Config::targetFPS);
 
     audioManager.Load();
     
@@ -40,6 +40,7 @@ Game::Game()
     
     
     Ball* ball = AddBall({gameWidth / 2.0f, 350.0f}, 10.0f, {0.0f, 0.0f}, BLUE);
+    ResetBall(ball);
 
     float flipperLen = 80.0f;
     float flipperSepDistX = 25.0f;
@@ -57,6 +58,14 @@ Game::Game()
 
 }
 
+void Game::ResetBall(Ball* ball)
+{
+    ball->velocity = {0.0f, 0.0f};
+    Vector2 resetPos = {1395.0f, 300.0f};
+    ball->resetPosition = resetPos;
+    ball->circleCollider.circle.position = resetPos;
+    ball->prevPhysicalPosition = resetPos;
+}
 
 
 
@@ -113,6 +122,7 @@ void Game::Update()
             flipper->UpdatePhysics(dtPhysics);
         }
         physicsEventsPerBall = physicsManager.Update(balls, lineColliders, circleColliders);
+        referee.HandleEvents(physicsEventsPerBall);
         dtSum -= dtPhysics;
     }
 
@@ -176,9 +186,6 @@ void Game::Draw()
 
             // for (CircleCollider* circle : circleColliders)
             //     circle->Draw();
-
-            // for (Wall* wall : walls)
-            //     wall->Draw();
             
         EndMode2D();
 
@@ -187,6 +194,16 @@ void Game::Draw()
         DrawText(fps.c_str(), 10, 10, 15, PURPLE);
         // Show time
         DrawText(std::to_string(time).c_str(), screenWidth - 80, 10, 15, PURPLE);
+
+        // Show score
+        int score = referee.score;
+        std::string scoreText = "Score: " + std::to_string(score);
+        DrawText(scoreText.c_str(), 10, gameHeight / 2, 25, PURPLE);
+        // Show high score
+        int highScore = referee.highScore;
+        std::string highScoreText = "High score: " + std::to_string(highScore);
+        DrawText(highScoreText.c_str(), gameWidth - 80, gameHeight / 2, 25, PURPLE);
+
     EndTextureMode();
 
     BeginTextureMode(shaderRenderTexture);
@@ -195,14 +212,14 @@ void Game::Draw()
             for (Ball* ball : balls)
                 ball->Draw();
 
-            for (Flipper* flipper : flippers)
-                flipper->Draw();
-            
             for (Wall* wall : walls)
                 wall->Draw();
-
+            
             for (Bumper* bumper : bumpers)
                 bumper->Draw();
+                
+            for (Flipper* flipper : flippers)
+                flipper->Draw();
 
         EndMode2D();
     EndTextureMode();
@@ -297,6 +314,7 @@ void Game::AddLevelWalls(Flipper* flipperL, Flipper* flipperR, Color wallColor)
     Wall* w8 = AddWall({x4, h8}, {x5R, h8}, 0.0f, 0.0f, false, false, false, wallColor);
     float h9 = 50.0f;
     Wall* w9 = AddWall(w3->GetPos2(), {x5R, w3->GetPos2().y + h9}, 0.0f, 0.0f, false, false, false, wallColor);
+    std::cout << w8->GetPos1().x << std::endl;
 }
 
 Flipper* Game::AddFlipper(Vector2 rotP, float len, Color c, int dir)

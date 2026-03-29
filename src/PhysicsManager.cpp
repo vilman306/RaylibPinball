@@ -18,6 +18,8 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
 
         Ball* ball = balls[i];
 
+        events.ball = ball;
+
         Vector2 ballAcc = {0, -GRAVITY};          // Virtual ball acceleration
         Vector2 ballVel = ball->velocity;         // Virtual ball velocity
         Vector2 ballPos = ball->circleCollider.circle.position; // Virtual ball position
@@ -28,14 +30,13 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
         ballPos += ballVel * dt;
 
         // Ball - edge collision:
-        if (ballPos.y - ballRad < 0.0f) // Ball - bottom edge
-        {
-            events.ballBounce = true;
-            ballPos.y = ballRad;
-            ballVel.y *= -1;
-            ballVel.y *= 0.2;
-            // ballVel.y *= BOUNCE_DAMPING;
-        }
+        // if (ballPos.y - ballRad < 0.0f) // Ball - bottom edge
+        // {
+        //     ballPos.y = ballRad;
+        //     ballVel.y *= -1;
+        //     ballVel.y *= 0.2;
+        //     // ballVel.y *= BOUNCE_DAMPING;
+        // }
         // if (ballPos.y + ballRad > Config::gameHeight) // Ball - upper edge
         // {
         //     events.ballBounce = true;
@@ -67,11 +68,13 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
             float posDiffLen = Vector2Length(posDiff);
             if (posDiffLen < ballRad + circleRad)
             {
-                events.ballBounce = true;
+                events.hitOwners.push_back(circleCollider->owner);
+                
                 Vector2 normal = Vector2Normalize(posDiff);
                 ballPos = circlePos + normal * (ballRad + circleRad);
 
                 float signedSpeedN = Vector2DotProduct(ballVel, normal);
+
                 if (signedSpeedN < 0.0f)
                 { // To prevent bugs if flipper moves into ball while ball is traveling from flipper
                     Vector2 velN = normal * signedSpeedN;
@@ -123,7 +126,8 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
             float d = Vector2Length(ballPos - p);
             if (d < ballRad)
             {
-                events.ballBounce = true;
+                events.hitOwners.push_back(lineCollider->owner);
+
                 Vector2 normal = lineCollider->line.normal;
                 ballPos = p + normal * ballRad;
                 float signedSpeedN = Vector2DotProduct(ballVel, normal);
@@ -176,7 +180,8 @@ std::vector<PhysicsEvents> PhysicsManager::Update(std::vector<Ball*>& balls, std
             
             if (posDiffLen < ballRad + ballBRad)
             {
-                events.ballBounce = true;
+                events.hitOwners.push_back(ballB->circleCollider.owner);
+
                 Vector2 normal = Vector2Normalize(posDiff);
                 float penetration = ballRad + ballBRad - posDiffLen;
                 ballPos += normal * 0.5f * penetration;
