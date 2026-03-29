@@ -21,13 +21,13 @@ Game::Game() : referee(this)
     
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(screenWidth, screenHeight, Config::windowTitle);
-    // MaximizeWindow();
+    MaximizeWindow();
     
     InitAudioDevice();
 
     SetTargetFPS(Config::targetFPS);
 
-    audioManager.Load();
+    // audioManager.Load();
     
     camera.target = {gameWidth / 2.0f, gameHeight / 2.0f};
     camera.rotation = 0.0f;
@@ -210,7 +210,6 @@ void Game::Draw()
 
         int padding = (int)(50 * fontScaling);
         int padding2 = (int)(430 * fontScaling);
-        // int fontPosXLeft = (screenWidth > gameWidth) ? (screenWidth - gameWidth + padding) : padding;
         int fontPosXLeft = padding;
         int fontPosXRight = screenWidth - padding2;
         int fontPosY = screenHeight / 2;
@@ -380,7 +379,7 @@ Game::~Game()
         delete bumper;
     UnloadRenderTexture(renderTexture);
     UnloadShader(shader);
-    audioManager.Unload();
+    // audioManager.Unload();
     CloseAudioDevice();
     CloseWindow();
 }

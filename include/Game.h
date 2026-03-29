@@ -31,7 +31,7 @@ private:
     Bumper* AddBumper(Vector2 pos, float rad, Color c);
     Camera2D camera;
     PhysicsManager physicsManager;
-    AudioManager audioManager;
+    // AudioManager audioManager;
     RenderTexture renderTexture;
     RenderTexture shaderRenderTexture;
     Shader shader;
