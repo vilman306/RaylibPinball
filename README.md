@@ -8,6 +8,7 @@ A simple pinball game with its own physics engine, built in C++ with raylib.
 * Flippers, bumpers, walls, ball
 * Score
 * Post-processing (bloom)
+* Debug mode (enable it by uncommenting //#define DEBUG in Game.cpp)
 
 # Controls
 * Left/right arrow - rotate left/right flipper
