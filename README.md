@@ -1,6 +1,8 @@
+![Gameplay](readmeContent/Gameplay.gif)
+
 A simple pinball game with its own physics engine, built in C++ with raylib.
 
-![Gameplay](readmeContent/Gameplay.gif)
+[Full gameplay](https://www.reddit.com/r/raylib/comments/1s805cm/i_made_a_simple_pinball_game_with_raylib/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button)
 
 # Features
 * A custom physics engine
